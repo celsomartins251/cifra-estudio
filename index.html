@@ -98,6 +98,7 @@ dialog::backdrop{background:#0008}dialog label{display:grid;gap:4px;margin-botto
 <div id="dg" hidden></div>
 <div class="dock"><button class="side inf" id="inf" aria-label="Ajustes: andamento, tom e estilo"><span id="dI"></span></button><button class="pbtn" id="pl" aria-label="Tocar ou parar"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button><span class="side ic"><button id="dgb" aria-label="Diagramas e escalas"><svg viewBox="0 0 24 24"><path d="M5 4v16M10 4v16M15 4v16M20 4v16M5 9h15M5 15h15"/></svg></button><button id="mxb" aria-label="Mixer"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button><button id="exb" aria-label="Exportar"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg></button></span><span id="pos"></span></div>
 <div class="sheet" id="sh" hidden><div class="shh"><b id="sht"></b><button id="shx" aria-label="Fechar">✕</button></div><div class="pn" id="pn-aj"><div class="ctl">
+<div class="w" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><label>Aplicar fórmula em<select id="ts-scope"><option value="all">Música inteira</option><option value="bar">Compasso específico</option></select></label><label>Compasso<select id="ts-bar"></select></label><label class="w">Fórmula de compasso<select id="ts-value"><option value="2/4">2/4</option><option value="6/8">6/8</option><option value="4/4" selected>4/4</option><option value="7/4">7/4</option><option value="7/8">7/8</option></select></label><button id="ts-apply" type="button" class="main">Aplicar fórmula</button></div>
 <label class="w">Andamento: <output id="bo"></output><input id="bpm" type="range" min="40" max="300"></label><label class="w">Começar a tocar em<select id="start-at"><option value="bar:0">Compasso 1</option></select></label>
 <label>Tom<select id="tp"></select></label>
 <label>Estilo<select id="sy"></select></label>
@@ -229,7 +230,7 @@ const E8=Array.from({length:8},(_,i)=>i/2);
 const STY={
 swing:{p:[[0,1.2],[2.67,.8]],b:[[0,'r'],[1,'3'],[2,'5'],[3,'a']],d:{51:[0,1,1.67,2,3,3.67],42:[1,3]}},
 bossa:{p:[[0,.8],[1.5,.8],[3,.8]],cycleP:[[[0,.8],[1.5,.8],[3,.8]],[[0,.72],[1,.34],[2.5,.72],[3.5,.34]],[[.5,.34],[1.5,.72],[2.5,.34],[3,.72]],[[0,.72],[1.75,.34],[2.5,.72],[3.5,.34]],[[0,.72],[1.5,.34],[2,.72],[3.25,.34]],[[.5,.34],[1,.72],[2.5,.72],[3.5,.34]],[[0,.72],[1.25,.34],[2,.72],[3.5,.72]],[[0,.72],[1.5,.72],[2.75,.34],[3.5,.34]]],b:[[0,'r'],[1.5,'5'],[2,'r'],[3.5,'5']],d:{36:[0,1.5,2,3.5],42:E8,37:[1.5,3]}},
-bossa1:{p:[[0,.45],[1,.45],[2,.45]],b:[[0,'r'],[1.5,'5'],[2,'r'],[3.5,'5']],d:{36:[0,1.5,2,3.5],42:E8,37:[1.5,3]}},
+bossa1:{p:[[0,.38],[.5,.38],[1.25,.38]],cell:2,b:[[0,'r'],[1,'5']],d:{36:[0,1],42:[.5,1.5],37:[.5,1.5]}},
 ballad:{p:[[0,3.8]],b:[[0,'r'],[2,'5']],d:{36:[0],42:[0,1,2,3],37:[3]}},
 rock:{p:[[0,1.8],[2,1.8]],b:E8.map(x=>[x,'r']),d:{36:[0,2,2.5],38:[1,3],42:E8}},
 pop:{p:[[0,3.8]],b:[[0,'r'],[2,'r'],[3.5,'5']],d:{36:[0,2],38:[1,3],42:E8}},
@@ -386,7 +387,7 @@ function sfEnsure(){if(SFREADY)return Promise.resolve();if(SFLOAD)return SFLOAD;
   if(!SFDATA&&!await sfFetch())return;
   sfSt('inicializando FluidSynth…');await sfWasm();
   try{SFN&&SFN.disconnect()}catch(e){}if(SFS){try{SFS.close()}catch(e){}SFS=null}
-  SFS=new JSSynth.Synthesizer();SFS.init(SFC.sampleRate);SFN=SFC.createScriptProcessor(2048,0,2);SFN.onaudioprocess=sfProc;
+  SFS=new JSSynth.Synthesizer();SFS.init(SFC.sampleRate);SFN=SFC.createScriptProcessor(4096,0,2);SFN.onaudioprocess=sfProc;
   sfSt('carregando o SoundFont no motor… a tela pode ficar parada por alguns segundos');await sfTick();const id=await SFS.loadSFont(SFDATA);if(!id)throw Error('SoundFont inválido');
   SFS.setChannelType(9,true);SFS.midiProgramSelect(0,id,0,0);SFS.midiProgramSelect(1,id,0,32);SFS.midiSFontSelect(9,id);
   SFREADY=true;sfSt('ativo ('+(SFDATA.byteLength/1048576).toFixed(1)+' MB).')}
@@ -421,7 +422,7 @@ $('#sf-file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{if(P
 $('#sf-use').onchange=()=>{if(PL)startSF()};
 let ctx,O,PL,tm,raf,li=-1,LOOP_RANGE=null,DRAG_RANGE=null,DRAG_START=null,DRAG_MOVED=false,LOOP_DRAG_CLICK=false,LOOP_UI_OPEN=false;
 function pump(){const P=PL,now=ctx.currentTime;
- while(P.i<P.ev.length){const e=P.ev[P.i],t=P.t0+e.b*P.spb;if(t>now+(P.sf?.75:.5))break;(P.sf?sfVoice:voice)(ctx,O,e,Math.max(t,now),e.d*P.spb);P.i++}
+ while(P.i<P.ev.length){const e=P.ev[P.i],t=P.t0+e.b*P.spb;if(t>now+(P.sf?.5:.3))break;(P.sf?sfVoice:voice)(ctx,O,e,Math.max(t,now),e.d*P.spb);P.i++}
  const end=P.t0+P.n*P.spb;
  if(P.i>=P.ev.length&&now+.3>=end){if(LOOP_RANGE||$('#lp').checked){const g=gen2();P.t0=end;P.ev=g.ev;P.n=g.n;P.marks=g.marks;P.bars=g.bars;P.i=0}else if(now>end)stop()}}
 function gen2(){const s=CI;CI=0;const g=gen();CI=s;return g}
@@ -431,7 +432,7 @@ function anim(){if(!PL)return;const bt=(ctx.currentTime-PL.t0)/PL.spb,bs=$$('.ba
  else $('#pos').textContent='Contagem…';
  raf=requestAnimationFrame(anim)}
 function start(){stop();$('#sh').hidden=true;document.querySelectorAll('.pn').forEach(x=>x.hidden=true);const useSF=sfActive();ctx=useSF?SFC:new(window.AudioContext||window.webkitAudioContext)();if(useSF)SFC.resume();O=mk(ctx);if(useSF){try{SFN.disconnect()}catch(e){}SFN.connect(O.master)}const g=gen();
- PL={ev:g.ev,n:g.n,marks:g.marks,bars:g.bars,t0:ctx.currentTime+(useSF?.35:.2),i:0,spb:60/BPM,sf:useSF};if(useSF)sfMix();tm=setInterval(pump,20);raf=requestAnimationFrame(anim);$('#pl').innerHTML=IS;document.body.classList.add('pl','hm');scrollTo(0,0)}
+ PL={ev:g.ev,n:g.n,marks:g.marks,bars:g.bars,t0:ctx.currentTime+(useSF?.35:.2),i:0,spb:60/BPM,sf:useSF};if(useSF)sfMix();tm=setInterval(pump,40);raf=requestAnimationFrame(anim);$('#pl').innerHTML=IS;document.body.classList.add('pl','hm');scrollTo(0,0)}
 function stop(){clearInterval(tm);cancelAnimationFrame(raf);sfSilence();if(ctx){if(ctx===SFC)ctx.suspend().catch(()=>{});else ctx.close()}ctx=O=PL=null;$('#pl').innerHTML=IP;document.body.classList.remove('pl','hm');$('#pos').textContent='';$$('.bar').forEach(x=>x.classList.remove('cur'));li=-1}
 const restart=()=>{if(PL)start()};
 function chartHTML(bars,sel,editMode=false){return bars.map((b,i)=>{const[l,r]=ln(bars,i),[n,d]=b.m.split('/'),mk=(b.sec?`<span class="sc">${esc(b.sec)}</span>`:'')+(b.seg?SEG:'')+(b.cod?COD:'');
@@ -641,7 +642,10 @@ $('#im-ok').onclick=async()=>{let t=$('#imt').value;for(const f of $('#imf').fil
 const IP='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',IS='<svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
 const info=()=>{$('#dI').innerHTML=`<b>${BPM}</b> bpm · ${CH}x · ${tr(S.k,T)}<small>${SL[SY]}</small>`};
 const PN={aj:'Ajustes',mx:'Mixer',ex:'Exportar',dg:'Diagramas e escalas'};
-function sheet(k){const sh=$('#sh');if(!sh.hidden&&sh.dataset.k==k){sh.hidden=true;return}sh.hidden=false;sh.dataset.k=k;$('#sht').textContent=PN[k];['aj','mx','ex','dg'].forEach(x=>$('#pn-'+x).hidden=x!=k)}
+function refreshTimeSignatureControls(){if(!S)return;const bars=parseBars(S.ch||'');$('#ts-bar').innerHTML=bars.map((b,i)=>`<option value="${i}">Compasso ${i+1} · ${b.m}</option>`).join('');$('#ts-bar').disabled=$('#ts-scope').value!='bar'}
+function sheet(k){const sh=$('#sh');if(!sh.hidden&&sh.dataset.k==k){sh.hidden=true;return}sh.hidden=false;sh.dataset.k=k;$('#sht').textContent=PN[k];['aj','mx','ex','dg'].forEach(x=>$('#pn-'+x).hidden=x!=k);if(k=='aj')refreshTimeSignatureControls()}
+$('#ts-scope').onchange=()=>refreshTimeSignatureControls();
+$('#ts-apply').onclick=()=>{if(!S)return;const bars=parseBars(S.ch||'');if(!bars.length)return;const meter=$('#ts-value').value;if($('#ts-scope').value=='all'){bars.forEach((b,i)=>{if(i===0)b.ts=meter;else delete b.ts})}else{const i=Math.max(0,Math.min(bars.length-1,+$('#ts-bar').value||0));bars[i].ts=meter}if(!S.u){const copy={...S,u:1};USER.push(copy);S=copy}else if(!USER.includes(S))USER.push(S);S.ch=ser(bars);save();grid();updateStartChoices();refreshTimeSignatureControls();if(PL)restart();$('#pos').textContent='Fórmula aplicada e salva.'};
 $('#inf').onclick=()=>sheet('aj');$('#mxb').onclick=()=>sheet('mx');$('#exb').onclick=()=>sheet('ex');$('#dgb').onclick=()=>sheet('dg');$('#shx').onclick=()=>$('#sh').hidden=true;
 const cx=q=>{const m=/(\/[A-G][b#]?)$/.exec(q),b=m?m[1]:'';q=q.replace(/\/[A-G][b#]?$/,'').replace(/[()]/g,'').replace(/^69/,'6add9').replace(/^(min|\^|-|h|o)?(.*)$/,(_,p,r)=>p=='min'?'m'+r:p=='^'?'maj'+(r||'7'):p=='-'?(/^\^/.test(r)?'mmaj'+(r.slice(1)||'7'):'m'+r):p=='h'?'m7b5'+r.replace(/^7/, ''):p=='o'?'dim'+r:r);return q+b};
 /* ---- Diagramas de acordes e escalas ---- */
