@@ -451,7 +451,7 @@ function anim(){if(!PL)return;const bt=(ctx.currentTime-PL.t0)/PL.spb,bs=$$('.ba
  else $('#pos').textContent='Contagem…';
  raf=requestAnimationFrame(anim)}
 function start(){stop();$('#sh').hidden=true;document.querySelectorAll('.pn').forEach(x=>x.hidden=true);const useSF=sfActive();ctx=useSF?SFC:new(window.AudioContext||window.webkitAudioContext)();if(useSF)SFC.resume();O=mk(ctx);if(useSF){try{SFN.disconnect()}catch(e){}SFN.connect(O.master)}const g=gen();
- PL={ev:g.ev,n:g.n,marks:g.marks,bars:g.bars,t0:ctx.currentTime+(useSF?.35:.2),i:0,spb:60/BPM,sf:useSF};if(useSF)sfMix();tm=setInterval(pump,40);raf=requestAnimationFrame(anim);$('#pl').innerHTML=IS;document.body.classList.add('pl','hm');scrollTo(0,0)}
+ PL={ev:g.ev,n:g.n,marks:g.marks,bars:g.bars,t0:ctx.currentTime+(useSF?.35:.2),i:0,spb:60/BPM,sf:useSF};if(useSF)sfMix();tm=setInterval(pump,40);$('#pl').innerHTML=IS;document.body.classList.add('pl','hm');scrollTo(0,0)}
 function stop(){clearInterval(tm);cancelAnimationFrame(raf);sfSilence();if(ctx){if(ctx===SFC)ctx.suspend().catch(()=>{});else ctx.close()}ctx=O=PL=null;$('#pl').innerHTML=IP;document.body.classList.remove('pl','hm');$('#pos').textContent='';$$('.bar').forEach(x=>x.classList.remove('cur'));li=-1}
 const restart=()=>{if(PL)start()};
 function chartHTML(bars,sel,editMode=false){return bars.map((b,i)=>{const[l,r]=ln(bars,i),[n,d]=b.m.split('/'),mk=(b.sec?`<span class="sc">${esc(b.sec)}</span>`:'')+(b.seg?SEG:'')+(b.cod?COD:'');
