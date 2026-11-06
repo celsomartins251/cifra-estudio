@@ -79,7 +79,7 @@ body.hm header,body.hm .nav,body.hm .dock,body.hm .sheet,body.hm #sub{display:no
 details summary{cursor:pointer;margin:6px 0;color:var(--ac);font-weight:600}
 body.pl main{padding-bottom:100px}
 
-body.pl .bar{min-height:clamp(80px,16vh,160px);font-size:clamp(1.2rem,6vw,2rem)}
+/* Mantém o tamanho dos compassos estável durante a reprodução. */
 dialog{width:min(560px,94vw);background:var(--bg);border:1px solid var(--ln);border-radius:14px;padding:16px}
 dialog::backdrop{background:#0008}dialog label{display:grid;gap:4px;margin-bottom:10px;font-size:.85rem;color:var(--mu)}
 #msg{min-height:1.4em;color:var(--mu);margin-top:8px;font-size:.9rem}
@@ -688,6 +688,6 @@ $('#dgo').onchange=e=>{DG=e.target.value;drawDG()};
 $('#play').addEventListener('click',e=>{if(LOOP_DRAG_CLICK){e.preventDefault();e.stopPropagation();return}if(e.target.closest('.dock,.sheet,button,select,input,label,summary,#dg'))return;
  const sp=e.target.closest('.bar>span[data-c]');if(sp&&!PL){setDG(sp.dataset.c);return}
  document.body.classList.toggle('hm')});
-lib();if(!window.JSSynth)sfSt('engine NÃO carregada: confira se engine/js-synthesizer.min.js e engine/libfluidsynth-2.4.6.js existem com esses nomes.');else sfFetch();
+lib();if(!window.JSSynth)sfSt('engine NÃO carregada: confira se engine/js-synthesizer.min.js e engine/libfluidsynth-2.4.6.js existem com esses nomes.');else sfSt('SoundFont será carregado somente quando você iniciar a reprodução.');
 </script>
 </body></html>
