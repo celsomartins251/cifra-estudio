@@ -443,7 +443,7 @@ let ctx,O,PL,tm,raf,li=-1,barEls=[],activeBarEl=null,markIndex=0,LOOP_RANGE=null
 function pump(){const P=PL,now=ctx.currentTime;
  while(P.i<P.ev.length){const e=P.ev[P.i],t=P.t0+e.b*P.spb;if(t>now+(P.sf?.5:.3))break;(P.sf?sfVoice:voice)(ctx,O,e,Math.max(t,now),e.d*P.spb);P.i++}
  const end=P.t0+P.n*P.spb;
- if(P.i>=P.ev.length&&now+.3>=end){if(LOOP_RANGE||$('#lp').checked){const g=gen2();P.t0=end;P.ev=g.ev;P.n=g.n;P.marks=g.marks;P.bars=g.bars;P.i=0}else if(now>end)stop()}}
+ if(P.i>=P.ev.length&&now+.3>=end){if(LOOP_RANGE||$('#lp').checked){const g=gen2();P.t0=end;P.ev=g.ev;P.n=g.n;P.marks=g.marks;P.bars=g.bars;markIndex=0;P.i=0}else if(now>end)stop()}}
 function gen2(){const s=CI;CI=0;const g=gen();CI=s;return g}
 function anim(){if(!PL)return;const bt=(ctx.currentTime-PL.t0)/PL.spb;
  if(bt>=PL.marks[0].b){while(markIndex+1<PL.marks.length&&PL.marks[markIndex+1].b<=bt+1e-6)markIndex++;const m=PL.marks[markIndex],e=barEls[m.i],br=PL.bars[m.i];if(br)setDG(br.c[Math.max(0,Math.min(br.c.length-1,Math.floor((bt-m.b)/(br.L/br.c.length))))]);
