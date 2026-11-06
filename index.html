@@ -79,7 +79,7 @@ body.hm header,body.hm .nav,body.hm .dock,body.hm .sheet,body.hm #sub{display:no
 details summary{cursor:pointer;margin:6px 0;color:var(--ac);font-weight:600}
 body.pl main{padding-bottom:100px}
 
-body.pl .bar{min-height:clamp(80px,16vh,160px);font-size:clamp(1.2rem,6vw,2rem)}
+/* Mantém o tamanho dos compassos estável durante a reprodução. */
 dialog{width:min(560px,94vw);background:var(--bg);border:1px solid var(--ln);border-radius:14px;padding:16px}
 dialog::backdrop{background:#0008}dialog label{display:grid;gap:4px;margin-bottom:10px;font-size:.85rem;color:var(--mu)}
 #msg{min-height:1.4em;color:var(--mu);margin-top:8px;font-size:.9rem}
@@ -92,17 +92,18 @@ dialog::backdrop{background:#0008}dialog label{display:grid;gap:4px;margin-botto
 <div id="chips"></div><div id="sel-actions" hidden><span id="sel-name"></span><button id="sel-delete" class="song-del" type="button">Excluir música</button><button id="sel-cancel" type="button">Cancelar</button></div><ul id="list"></ul>
 </section>
 <section id="play" hidden>
-<div class="nav" style="display:flex;gap:8px"><button id="bk">← Biblioteca</button><button id="edt">Editar</button><button id="help-play" type="button">Ajuda</button></div>
+<div class="nav" style="display:flex;gap:8px"><button id="bk">← Biblioteca</button><button id="edt">Editar</button><button id="adjust-play" type="button">Ajustes</button></div>
 <h1 id="tt"></h1><div id="sub"></div>
 <div id="grid" aria-live="off"></div><div id="loop-tools" hidden><span id="loop-label">Arraste pelos compassos para selecionar um trecho.</span><button id="loop-play" type="button">Tocar loop</button><button id="loop-clear" type="button">Limpar seleção</button></div>
 <div id="dg" hidden></div>
 <div class="dock"><button class="side inf" id="inf" aria-label="Ajustes: andamento, tom e estilo"><span id="dI"></span></button><button class="pbtn" id="pl" aria-label="Tocar ou parar"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button><span class="side ic"><button id="dgb" aria-label="Diagramas e escalas"><svg viewBox="0 0 24 24"><path d="M5 4v16M10 4v16M15 4v16M20 4v16M5 9h15M5 15h15"/></svg></button><button id="mxb" aria-label="Mixer"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button><button id="exb" aria-label="Exportar"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg></button></span><span id="pos"></span></div>
 <div class="sheet" id="sh" hidden><div class="shh"><b id="sht"></b><button id="shx" aria-label="Fechar">✕</button></div><div class="pn" id="pn-aj"><div class="ctl">
+<div class="w" style="display:grid;grid-column:1/-1;grid-template-columns:1fr 1fr;gap:8px"><label>Aplicar fórmula em<select id="ts-scope"><option value="all">Música inteira</option><option value="bar">Compasso específico</option></select></label><label>Compasso<select id="ts-bar"></select></label><label class="w">Fórmula de compasso<select id="ts-value"><option value="2/4">2/4</option><option value="6/8">6/8</option><option value="4/4" selected>4/4</option><option value="7/4">7/4</option><option value="7/8">7/8</option></select></label><button id="ts-apply" type="button" class="main">Aplicar fórmula</button></div>
 <label class="w">Andamento: <output id="bo"></output><input id="bpm" type="range" min="40" max="300"></label><label class="w">Começar a tocar em<select id="start-at"><option value="bar:0">Compasso 1</option></select></label>
 <label>Tom<select id="tp"></select></label>
 <label>Estilo<select id="sy"></select></label>
 <label>Choruses<input id="ch" type="number" min="1" max="9" value="2"></label>
-<div><label class="ck"><input type="checkbox" id="lp">Repetir sem parar</label><label class="ck"><input type="checkbox" id="ci" checked>Contagem (1 compasso)</label></div>
+<div><label class="ck"><input type="checkbox" id="lp">Repetir sem parar</label><label class="ck"><input type="checkbox" id="ci" checked>Contagem (1 compasso)</label><label class="ck"><input type="checkbox" id="metro">Metrônomo junto com a base</label></div>
 <div style="grid-column:1/-1;display:grid;gap:6px"><label class="ck"><input type="checkbox" id="sf-use" checked>Usar SoundFont (sons reais)</label><div id="sf-status" class="mu" role="status">SoundFont: aguardando</div><label>Carregar SoundFont (.sf2) do aparelho<input type="file" id="sf-file" accept=".sf2,application/octet-stream"></label></div>
 </div></div><div class="pn" id="pn-mx" hidden><div class="mixgrid">
 <div class="mixch"><b>PIANO</b><output id="vpo">90%</output><div class="fader-rail"><input id="vp" type="range" min="0" max="1" step=".01" value=".9" aria-label="Volume do piano"></div><div class="mix-buttons"><button type="button" data-mute="p">MUTE</button><button type="button" data-solo="p">SOLO</button></div></div>
@@ -133,7 +134,7 @@ dialog::backdrop{background:#0008}dialog label{display:grid;gap:4px;margin-botto
 <div style="display:flex;justify-content:flex-end;margin-top:12px"><button id="help-close">Fechar</button></div>
 </dialog>
 <dialog id="ed">
-<div class="eh"><button id="ed-x" aria-label="Voltar">←</button><b style="flex:1" id="eh">Editor</b><button id="kb-mode" class="kb-mode" type="button">Teclado: app</button><button id="help-editor" type="button" aria-label="Ajuda">?</button><button id="ed-i" aria-label="Detalhes da música">ⓘ</button><button class="main" id="ed-ok">Salvar</button></div>
+<div class="eh"><button id="ed-x" aria-label="Voltar">←</button><b style="flex:1" id="eh">Editor</b><button id="kb-mode" class="kb-mode" type="button">Teclado: app</button><button id="ed-i" aria-label="Detalhes da música">ⓘ</button><button class="main" id="ed-ok">Salvar</button></div>
 <details id="eio"><summary>Detalhes da música</summary>
 <label>Título<input type="text" id="et"></label><label>Compositor / origem<input type="text" id="ea"></label>
 <div class="ctl" style="margin:0 0 8px"><label>Categoria<select id="ec"></select></label><label>Estilo<select id="es"></select></label><label>Andamento (bpm)<input type="number" id="eb" value="100" min="40" max="300"></label><label>Playlist<select id="ep-list"></select></label><button id="ep-new" type="button">+ Criar playlist</button></div>
@@ -199,7 +200,7 @@ const XO=['b5','#5','b9','9','#9','11','#11','b13','13'],fm=s=>s.replace(/b/g,'�
 const pr=c=>{if(c=='NC')return'<span class="nc">N.C.</span>';const m=/^([A-G][b#]?)([^\/]*)(\/[A-G][b#]?)?$/.exec(c);if(!m)return c;const h=(/^(m7b5|dim|maj|m)/.exec(m[2])||[''])[0],r=m[2].slice(h.length),re=/[b#](?:5|9|11|13)/g,al=(r.match(re)||[]).sort((a,b)=>XO.indexOf(a)-XO.indexOf(b)),
  s=fm(h.replace('m7b5','ø7').replace('maj','Δ').replace(/^m$/,'-').replace('dim','o')+r.replace(re,'')+al.join(''));
  return m[1].replace('b','♭').replace('#','♯')+(s?'<sup>'+s+'</sup>':'')+(m[3]?'<small>'+fm(m[3])+'</small>':'')};
-const SL={swing:'Swing',bossa:'Bossa Nova',ballad:'Balada',rock:'Rock',pop:'Pop',funk:'Funk',vaneira:'Vaneira',arrocha:'Arrocha',axe1:'Axé 1',axe2:'Axé 2',superbalada:'Super Balada',guarania:'Guarânia',afoxe:'Afoxé',arrocha2:'Arrocha 2',avioes:'Aviões',baiao:'Baião',natiruts:'Natiruts',pop6:'Pop 6',reggae:'Reggae',pagodao:'Pagodão',bolero:'Bolero',pop16:'Pop 16avos',popdance:'Pop Dance',rockshuffle:'Rock Shuffle',rockbalada:'Rock Balada',reggaeonedrop:'Reggae One Drop',reggaesteppers:'Reggae Steppers',funk16:'Funk 16',funksoul:'Funk Soul',blues68:'Blues 6/8',salsa:'Salsa',mambo:'Mambo',chacha:'Cha-cha-chá',merengue:'Merengue'};
+const SL={swing:'Swing',jazzbebop:'Jazz Bebop',bossa1:'Bossa Nova 1',bossa:'Bossa Nova 2',ballad:'Balada',rock:'Rock',pop:'Pop',funk:'Funk',vaneira:'Vaneira',arrocha:'Arrocha',axe1:'Axé 1',axe2:'Axé 2',superbalada:'Super Balada',guarania:'Guarânia',afoxe:'Afoxé',arrocha2:'Arrocha 2',avioes:'Aviões',baiao:'Baião',natiruts:'Natiruts',pop6:'Pop 6',reggae:'Reggae',pagodao:'Pagodão',bolero:'Bolero',pop16:'Pop 16avos',popdance:'Pop Dance',rockshuffle:'Rock Shuffle',rockbalada:'Rock Balada',reggaeonedrop:'Reggae One Drop',reggaesteppers:'Reggae Steppers',funk16:'Funk 16',funksoul:'Funk Soul',blues68:'Blues 6/8',salsa:'Salsa',mambo:'Mambo',chacha:'Cha-cha-chá',merengue:'Merengue'};
 const CATS=['Todas','Jazz','Blues','Latim','Pop','Rock','Funk','Minhas'];
 const RA='Bb G7|Cm7 F7|Dm7 G7|Cm7 F7|Fm7 Bb7|Eb6 Ebm7|Dm7 G7|Cm7 F7';
 const S0=(t,a,c,s,bpm,k,ch)=>({t,a,c,s,bpm,k,ch});
@@ -228,7 +229,9 @@ const ALL=()=>SONGS.concat(USER),save=()=>{try{localStorage.setItem('cs_user',JS
 const E8=Array.from({length:8},(_,i)=>i/2);
 const STY={
 swing:{p:[[0,1.2],[2.67,.8]],b:[[0,'r'],[1,'3'],[2,'5'],[3,'a']],d:{51:[0,1,1.67,2,3,3.67],42:[1,3]}},
-bossa:{p:[[0,.8],[1.5,.8],[3,.8]],b:[[0,'r'],[1.5,'5'],[2,'r'],[3.5,'5']],d:{36:[0,1.5,2,3.5],42:E8,37:[1.5,3]}},
+jazzbebop:{p:[[0,.9],[1.5,.65],[2.67,.65],[3.5,.45]],b:[[0,'r'],[1,'3'],[2,'5'],[3,'a']],d:{42:[1,3],38:[1,3],36:[0,2.5]}},
+bossa:{p:[[0,.8],[1.5,.8],[3,.8]],cycleP:[[[0,.8],[1.5,.8],[3,.8]],[[0,.72],[1,.34],[2.5,.72],[3.5,.34]],[[.5,.34],[1.5,.72],[2.5,.34],[3,.72]],[[0,.72],[1.75,.34],[2.5,.72],[3.5,.34]],[[0,.72],[1.5,.34],[2,.72],[3.25,.34]],[[.5,.34],[1,.72],[2.5,.72],[3.5,.34]],[[0,.72],[1.25,.34],[2,.72],[3.5,.72]],[[0,.72],[1.5,.72],[2.75,.34],[3.5,.34]]],b:[[0,'r'],[1.5,'5'],[2,'r'],[3.5,'5']],d:{36:[0,1.5,2,3.5],42:E8,37:[1.5,3]}},
+bossa1:{p:[[0,.38],[.5,.38],[1.25,.38]],cell:2,b:[[0,'r'],[1,'5']],d:{36:[],42:[0,.5,1.25]}},
 ballad:{p:[[0,3.8]],b:[[0,'r'],[2,'5']],d:{36:[0],42:[0,1,2,3],37:[3]}},
 rock:{p:[[0,1.8],[2,1.8]],b:E8.map(x=>[x,'r']),d:{36:[0,2,2.5],38:[1,3],42:E8}},
 pop:{p:[[0,3.8]],b:[[0,'r'],[2,'r'],[3.5,'5']],d:{36:[0,2],38:[1,3],42:E8}},
@@ -262,7 +265,7 @@ chacha:{two:1,p:[[1,0.3],[2,0.3],[3,0.3],[3.5,0.3],[5,0.3],[6,0.3],[7,0.3],[7.5,
 merengue:{cell:2,p:[[0.5,0.3],[1.5,0.3]],b:[[0,'r'],[1,'5']],d:{62:[0.5,1.5],64:[0,1],73:[0.0,0.25,0.5,0.75,1.0,1.25,1.5,1.75]},v:{62:[60,60],64:[100,100],73:[90,45,70,45,90,45,70,45]}},
 funk:{p:[[0,.4],[.75,.2],[1.5,.4],[2.5,.4],[3.25,.2]],b:[[0,'r'],[.75,'r'],[1.75,'5'],[2.5,'r'],[3.25,'r']],d:{36:[0,1.5,2.75],38:[1,3],42:E8}}};
 const VEL={36:100,38:85,37:70,42:55,51:65};
-let S,T=0,BPM=100,SY='swing',CH=2,CI=1,V={p:.9,b:.9,d:.7,r:.2,m:.85},MUTE={p:false,b:false,d:false,r:false,m:false},SOLO={p:false,b:false,d:false,r:false,m:false};
+let S,T=0,BPM=100,SY='swing',CH=2,CI=1,MC=0,V={p:.9,b:.9,d:.7,r:.2,m:.85},MUTE={p:false,b:false,d:false,r:false,m:false},SOLO={p:false,b:false,d:false,r:false,m:false};
 const bn=pc=>28+((pc-4+12)%12);
 
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -273,7 +276,7 @@ const COD='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-wid
 function parseBars(d){
  /* Cifras entre parênteses são alternativas visuais no iReal Pro, não novos tempos; preserve texto de pauta entre <...>. */
  d=d.replace(/<[^>]*>|\([^)]*\)/g,x=>x[0]=='<'?x:'');
- const re=/<([^>]*)>|T(\d\d\d?)|\*([A-Za-z])|N(\d)|XyQ|Kcl|LZ|([\[\]{}Z|])|(N\.?C\.?)|([A-G][b#]?(?:min|sus|add|alt|maj|dim|aug|m|[-^+ho0-9#b]|\/[A-G][b#]?)*)|([xrpWnSQ%])|./g;
+ const re=/<([^>]*)>|T(\d\d\d?)|\*([A-Za-z])|N(\d)|XyQ|Kcl|LZ|([\[\]{}Z|])|(N\.?C\.?)|([A-G][b#]?(?:min|sus|add|alt|maj|dim|aug|m|[-^+ho0-9#b]|\/[A-G][b#]?)*)|([xrpWnSQ%])|(~)|./g;
  const bars=[];let b={c:[]},m;
  const has=x=>x.c.length||x.rep,push=br=>{if(has(b)){if(br)b.br=br;bars.push(b);b={c:[]}}else if(br&&bars.length&&!bars[bars.length-1].br)bars[bars.length-1].br=br};
  while(m=re.exec(d)){const t=m[0];
@@ -286,6 +289,7 @@ function parseBars(d){
   else if(m[6])b.c.push('NC');
   else if(m[7]){const[,r,q]=/^([A-G][b#]?)(.*)$/.exec(m[7]);b.c.push(r+cx(q))}
   else if(m[8]){const k=m[8];if(k=='S')b.seg=1;else if(k=='Q')b.cod=1;else if(k=='n')b.c.push('NC');else if(k=='x'||k=='r'||k=='%')b.rep=1}
+  else if(m[9])b.c.push('');
   else if(t=='LZ')push();
   else if(t=='Kcl'){push();b.rep=1}}
  push();
@@ -294,14 +298,14 @@ function fin(bars,keep){
  let mm='4/4',pm=null,e1=0,cur=0,cnt=0,lim=99;
  bars.forEach((x,i)=>{x.showTs=0;x.es=0;x.el=0;if(x.ts&&x.ts!=mm)x.showTs=1;if(x.ts)mm=x.ts;if(!i)x.showTs=1;x.m=mm;
   const[n,dn]=mm.split('/').map(Number);x.L=n*4/dn;x.cmp=dn==8&&n>=6&&n%3==0;
-  if(x.rep&&pm)x.c=pm.c.slice();if(!x.c.length&&!keep)x.c=['NC'];pm=x;
+  if(x.rep&&pm)x.c=pm.c.slice();pm=x;
   if(x.end){cur=x.end;cnt=0;x.el=1;lim=x.end==1?99:(e1||99)}else if(cur&&(x.sec||x.bl=='{'))cur=0;
   if(cur){cnt++;x.es=cur;if(x.br||cnt>=lim){if(cur==1)e1=cnt;cur=0}}});
  return bars}
 function ser(bars){const o=[];bars.forEach((b,i)=>{const pc=i&&bars[i-1].br;
  if(b.bl=='{'||b.bl=='[')o.push(b.bl);else if(i&&!pc)o.push('|');
  if(b.ts)o.push('T'+b.ts.replace('/',''));if(b.sec)o.push('*'+b.sec);if(b.secName&&b.txt!=b.secName)o.push('<'+b.secName+'>');if(b.seg)o.push('S');if(b.cod)o.push('Q');if(b.end)o.push('N'+b.end);if(b.txt)o.push('<'+b.txt+'>');
- if(b.rep)o.push('%');else{const last=b.c.reduce((a,c,i)=>c?a=i:a,-1);if(last>=0)o.push(b.c.slice(0,last+1).map(c=>c?(c=='NC'?'N.C.':c):'N.C.').join(' '));}if(b.br)o.push(b.br)});return o.join(' ')}
+ if(b.rep)o.push('%');else{const last=b.c.reduce((a,c,i)=>c?a=i:a,-1);if(last>=0)o.push(Array.from({length:last+1},(_,j)=>{const c=b.c[j];return c?(c=='NC'?'N.C.':c):'~'}).join(' '));}if(b.br)o.push(b.br)});return o.join(' ')}
 const prep=(s,t)=>{const b=parseBars(s);b.forEach(x=>x.c=x.c.map(c=>c=='NC'?c:tr(c,t)));return b};
 function ln(bars,i){const b=bars[i],col=i%4,pc=i&&bars[i-1].br;
  const l=(col==0||!pc||b.bl)?(b.bl=='{'?'t3':b.bl=='['?'t2':'t1'):'';
@@ -321,22 +325,42 @@ function seq(bars){const out=[],cds=[];bars.forEach((b,i)=>b.cod&&cds.push(i));
  return out}
 const CP={p:[[0,1.4],[1.5,1.4]],b:[[0,'r'],[1.5,'5']],d:{36:[0],38:[1.5],42:[0,.5,1,1.5,2,2.5]}};
 function two(s,O){const o={p:[],b:[],d:{},v:{}};s.p.forEach(([x,d])=>x>=O&&x<O+4&&o.p.push([x-O,d]));s.b.forEach(([x,g])=>x>=O&&x<O+4&&o.b.push([x-O,g]));for(const n in s.d)s.d[n].forEach((x,j)=>{if(x>=O&&x<O+4){(o.d[n]=o.d[n]||[]).push(x-O);(o.v[n]=o.v[n]||[]).push(s.v[n][j])}});return o}
-function pat(st,L,cmp,bi){let s=cmp?((STY[st]&&STY[st].m68)||CP):STY[st];if(!cmp&&s.two)s=two(s,((bi|0)&1)*4);const cell=cmp?3:(s.cell||4),o={p:[],b:[],d:{}};
- for(let f=0;f<L-.01;f+=cell){s.p.forEach(([x,d])=>x+f<L&&o.p.push([x+f,d]));s.b.forEach(([x,g])=>x+f<L&&o.b.push([x+f,g]));
-  for(const n in s.d){const vs=s.v&&s.v[n];s.d[n].forEach((x,j)=>{if(x+f<L){(o.d[n]=o.d[n]||[]).push(x+f);if(vs)((o.v=o.v||{})[n]=o.v[n]||[]).push(vs[j])}})}}return o}
+function pat(st,L,cmp,bi){
+ let s=cmp?((STY[st]&&STY[st].m68)||CP):STY[st];
+ if(!cmp&&s.two)s=two(s,((bi|0)&1)*4);
+ const piano=(st=='bossa'&&L==4&&!cmp&&s.cycleP)?s.cycleP[(bi|0)%s.cycleP.length]:s.p;
+ const drum=s.d,cell=cmp?3:(s.cell||4),o={p:[],b:[],d:{}};
+ for(let f=0;f<L-.01;f+=cell){
+  piano.forEach(([x,d])=>x+f<L&&o.p.push([x+f,d]));
+  s.b.forEach(([x,g])=>x+f<L&&o.b.push([x+f,g]));
+  for(const n in drum){
+   if(!cmp&&(st=='bossa'||st=='bossa1')&&+n===36)continue;
+   const vs=s.v&&s.v[n];
+   drum[n].forEach((x,j)=>{if(x+f<L){(o.d[n]=o.d[n]||[]).push(x+f);if(vs)((o.v=o.v||{})[n]=o.v[n]||[]).push(vs[j])}})
+  }
+ }
+ if(!cmp&&(st=='bossa'||st=='bossa1')){
+  const kick=[];
+  for(let f=0;f<L-.01;f+=2)for(const x of [0,.75,1,1.75])if(f+x<L)kick.push(f+x);
+  o.d[36]=kick;
+ }
+ return o
+}
 function gen(){
- const bars=prep(S.ch,T);let ord=seq(bars);const start=$('#start-at')?.value||'bar:0';let startBar=0;if(LOOP_RANGE){startBar=LOOP_RANGE[0];const[a,z]=LOOP_RANGE;ord=ord.filter(i=>i>=a&&i<=z);if(!ord.length)ord=Array.from({length:z-a+1},(_,j)=>a+j)}else{if(start.startsWith('bar:'))startBar=Math.max(0,Math.min(bars.length-1,+start.slice(4)||0));else if(start.startsWith('sec:')){const wanted=start.slice(4),found=bars.findIndex(b=>b.sec==wanted||b.secName==wanted);if(found>=0)startBar=found}const orderPos=ord.findIndex(i=>i>=startBar);if(orderPos>0)ord=ord.slice(orderPos);else if(orderPos<0)ord=ord.filter(i=>i>=startBar)}const ev=[],marks=[],b0=CI?Math.ceil((bars[startBar]||bars[0]).L):0;
+ const bars=prep(S.ch,T);let ord=seq(bars);const start=$('#start-at')?.value||'bar:0';let startBar=0;if(LOOP_RANGE){startBar=LOOP_RANGE[0];const[a,z]=LOOP_RANGE;ord=ord.filter(i=>i>=a&&i<=z);if(!ord.length)ord=Array.from({length:z-a+1},(_,j)=>a+j)}else{if(start.startsWith('bar:'))startBar=Math.max(0,Math.min(bars.length-1,+start.slice(4)||0));else if(start.startsWith('sec:')){const wanted=start.slice(4),found=bars.findIndex(b=>b.sec==wanted||b.secName==wanted);if(found>=0)startBar=found}const orderPos=ord.findIndex(i=>i>=startBar);if(orderPos>0)ord=ord.slice(orderPos);else if(orderPos<0)ord=ord.filter(i=>i>=startBar)}const ev=[],marks=[],b0=CI?Math.ceil((bars[startBar]||bars[0]).L):0;let carryChord='';
  if(CI)for(let i=0;i<b0;i++)ev.push({b:i,d:.2,k:'d',n:i?76:77,v:i?80:110});
  let o=b0;
  for(let c=0;c<(LOOP_RANGE?1:CH);c++)ord.forEach((k,idx)=>{
-  const bar=bars[k],L=bar.L,cs=bar.c,pt=pat(SY,L,bar.cmp,idx),at=p=>Math.min(cs.length-1,Math.floor(p/(L/cs.length)+1e-6));
+  const bar=bars[k],L=bar.L,cs=bar.c,pt=pat(SY,L,bar.cmp,idx),slots=Math.max(beatCount(bar),cs.length),at=p=>Math.min(slots-1,Math.floor(p/(L/slots)+1e-6)),chordAt=a=>{for(let z=Math.min(a,cs.length-1);z>=0;z--)if(cs[z])return cs[z];return carryChord};
   marks.push({b:o,i:k,c:c+1,m:bar.m});
+  if(MC){const [mn,md]=bar.m.split('/').map(Number),compound=md==8&&mn%3==0,step=compound?1.5:4/md,count=compound?mn/3:mn;for(let beat=0;beat<count;beat++)ev.push({b:o+beat*step,d:.075,k:'d',n:beat===0?77:76,v:beat===0?112:82})}
   for(const n in pt.d)pt.d[n].forEach((p,j)=>ev.push({b:o+p,d:.2,k:'d',n:+n,v:(pt.v&&pt.v[n]&&pt.v[n][j])||VEL[n]}));
-  pt.p.forEach(([p,d])=>{const cc=cs[at(p)];if(cc=='NC')return;const[r,q]=rt(cc),iv=IV(q);ev.push({b:o+p,d,k:'p',n:48+r,v:50});
+  pt.p.forEach(([p,d])=>{const cc=chordAt(at(p));if(!cc||cc=='NC')return;const[r,q]=rt(cc),iv=IV(q);ev.push({b:o+p,d,k:'p',n:48+r,v:50});
    iv.slice(1).forEach((x,j)=>{if(j==1&&iv.x&&x==7)return;ev.push({b:o+p,d,k:'p',n:60+(r+x%12)%12+(x>12?12:0),v:68})})});
-  pt.b.forEach(([p,g],j,Ls)=>{const a=at(p),cc=cs[a];if(cc=='NC')return;const[r,q]=rt(cc),iv=IV(q),nx=a<cs.length-1?cs[a+1]:bars[ord[(idx+1)%ord.length]].c[0];
+  pt.b.forEach(([p,g],j,Ls)=>{const a=at(p),cc=chordAt(a);if(!cc||cc=='NC')return;const[r,q]=rt(cc),iv=IV(q),nx=a<cs.length-1?(cs[a+1]||cc):(bars[ord[(idx+1)%ord.length]].c.find(Boolean)||cc);
    const pc=g=='r'?r:g=='3'?r+iv[1]:g=='5'?r+iv[2]:nx=='NC'?r:rt(nx)[0]-1,e=(j<Ls.length-1?Ls[j+1][0]:L)-p;
    ev.push({b:o+p,d:e*.9,k:'b',n:bn((pc+12)%12),v:100})});
+  for(let z=cs.length-1;z>=0;z--)if(cs[z]){carryChord=cs[z];break}
   o+=L});
  ev.sort((x,y)=>x.b-y.b);return{ev,n:o,marks,bars,b0}}
 let NBF;
@@ -433,7 +457,7 @@ const restart=()=>{if(PL)start()};
 function chartHTML(bars,sel,editMode=false){return bars.map((b,i)=>{const[l,r]=ln(bars,i),[n,d]=b.m.split('/'),mk=(b.sec?`<span class="sc">${esc(b.sec)}</span>`:'')+(b.seg?SEG:'')+(b.cod?COD:'');
   return `<div class="bar c${Math.min(b.c.length,6)}${b.showTs?' hts':''}${b.es?' es':''}${i==sel?' sel':''}" data-i="${i}">`+(l?`<i class="bl ${l}"></i>`:'')+(r?`<i class="br ${r}"></i>`:'')
   +(mk?`<span class="mk">${mk}</span>`:'')+(b.txt?`<span class="tx">${esc(b.txt)}</span>`:'')+(b.es?`<span class="en${b.el?' f':''}">${b.el?b.end+'.':''}</span>`:'')
-  +(b.showTs?`<span class="ts"><b>${n}</b><b>${d}</b></span>`:'')+(b.rep?RPT:(editMode?Array.from({length:Math.max(beatCount(b),b.c.length)},(_,j)=>b.c[j]?`<span data-c="${b.c[j]}" data-beat="${j}">${pr(b.c[j])}</span>`:`<span class="beat-slot" data-beat="${j}">·</span>`):b.c.filter(Boolean).map((c,j)=>`<span data-c="${c}" data-beat="${j}">${pr(c)}</span>`).join('')) )+'</div>'}).join('')}
+  +(b.showTs?`<span class="ts"><b>${n}</b><b>${d}</b></span>`:'')+(b.rep?RPT:(editMode?Array.from({length:Math.max(beatCount(b),b.c.length)},(_,j)=>b.c[j]?`<span data-c="${b.c[j]}" data-beat="${j}">${pr(b.c[j])}</span>`:`<span class="beat-slot" data-beat="${j}">·</span>`):Array.from({length:b.c.length},(_,j)=>b.c[j]?`<span data-c="${b.c[j]}" data-beat="${j}">${pr(b.c[j])}</span>`:`<span class="beat-slot" data-beat="${j}">·</span>`).join('')) )+'</div>'}).join('')}
 function grid(){const bars=prep(S.ch,T);$('#grid').innerHTML=chartHTML(bars,-1);if(LOOP_RANGE)paintLoopRange(LOOP_RANGE);
  $('#tt').textContent=S.t;$('#sub').textContent=S.a+' · '+SL[SY]+' · Tom '+tr(S.k,T)+' · '+bars[0].m;$('#bo').textContent=BPM+' bpm';info();
  if(!PL){DGC='';setDG(bars.flatMap(b=>b.c).find(c=>c!='NC')||'')}}
@@ -475,14 +499,14 @@ $('#list').onkeydown=e=>{const row=e.target.closest('li[data-i]');if(!row)return
 function updateStartChoices(){const sel=$('#start-at');if(!sel||!S)return;const prev=sel.value,bars=prep(S.ch,T),opts=[['bar:0','Compasso 1']];bars.forEach((b,i)=>opts.push([`bar:${i}`,`Compasso ${i+1}`]));const seen=new Set();bars.forEach((b,i)=>{const k=b.secName||b.sec;if(k&&!seen.has(k)){seen.add(k);const key=b.sec||k,label=b.secName||({'I':'Introdução','T':'Tema','V':'Verso'}[key]||`Trecho ${key}`);opts.push([`sec:${key}`,`Trecho ${label} (compasso ${i+1})`])}});sel.innerHTML=opts.map(([v,l])=>`<option value="${esc(v)}">${esc(l)}</option>`).join('');sel.value=opts.some(([v])=>v==prev)?prev:'bar:0'}
 $('#start-at').onchange=()=>{if(PL)start()};
 $('#section-apply').onclick=()=>{const choice=$('#section-mark').value,b=eb();if(!choice){b.sec=undefined;b.secName=undefined}else{const map={'Introdução':'I','Intro':'I','Tema':'T','Verso':'V','Refrão':'R'};b.sec=map[choice]||choice;b.secName=choice;if(['Introdução','Tema','Verso','Refrão'].includes(choice))b.txt=choice}erender();updateStartChoices();$('#emsg').textContent=choice?`Trecho ${choice} marcado no compasso ${SEL+1}.`:'Marcação removida.'};
-$('#help-open').onclick=()=>$('#help-dialog').showModal();$('#help-play').onclick=()=>$('#help-dialog').showModal();$('#help-editor').onclick=()=>$('#help-dialog').showModal();$('#help-close').onclick=()=>$('#help-dialog').close();
+$('#help-open').onclick=()=>$('#help-dialog').showModal();$('#adjust-play').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();sheet('aj')},{capture:true});$('#help-close').onclick=()=>$('#help-dialog').close();
 $('#bk').onclick=()=>{stop();show('lib')};
 $('#pl').onclick=()=>PL?stop():startSF();
 $('#bpm').oninput=e=>{BPM=+e.target.value;$('#bo').textContent=BPM+' bpm';info()};$('#bpm').onchange=restart;
 $('#tp').onchange=e=>{T=+e.target.value;grid();restart()};
 $('#sy').onchange=e=>{SY=e.target.value;grid();restart()};
 $('#ch').onchange=e=>{CH=Math.max(1,Math.min(9,+e.target.value||1));e.target.value=CH;info();restart()};
-$('#ci').onchange=e=>{CI=e.target.checked?1:0;restart()};
+$('#ci').onchange=e=>{CI=e.target.checked?1:0;restart()};$('#metro').onchange=e=>{MC=e.target.checked?1:0;restart()};
 const MIX=[['vp','vpo','p'],['vb','vbo','b'],['vd','vdo','d'],['vr','vro','r'],['vm','vmo','m']];
 const soloActive=()=>Object.values(SOLO).some(Boolean);
 function syncGains(){if(!O)return;const now=ctx.currentTime;for(const k of ['p','b','d'])O[k].gain.setTargetAtTime((MUTE[k]||(soloActive()&&!SOLO[k]))?0:V[k],now,.035);O.wet.gain.setTargetAtTime((MUTE.r||(soloActive()&&!SOLO.r))?0:V.r,now,.035);O.master.gain.setTargetAtTime((MUTE.m||(soloActive()&&!SOLO.m))?0:V.m,now,.035);sfMix()}
@@ -607,7 +631,7 @@ const UNS=s=>{let r='';while(s.length>50){const p=s.slice(0,50);s=s.slice(50);if
 const cq=q=>{q=q.replace(/\/[A-G][b#]?$/,'');return /^\^/.test(q)?'maj7':/^-/.test(q)?(/^-\^/.test(q)?'m':/^-(7|9|11|13)/.test(q)?'m7':/^-6/.test(q)?'m6':'m'):/^h/.test(q)?'m7b5':/^o/.test(q)?'dim':/^(7|9|11|13)/.test(q)?'7':/^6/.test(q)?'6':''};
 const parseChart=d=>{const b=parseBars(d);return b.length?ser(b):''};
 function styleMap(s){s=(s||'').toLowerCase();
- const st=/bossa|samba|latin|salsa|mambo|bolero|rumba/.test(s)?'bossa':/ballad/.test(s)?'ballad':/rock|metal|punk/.test(s)?'rock':/funk|soul|r&b|disco/.test(s)?'funk':/pop|country|folk|reggae|ska/.test(s)?'pop':'swing';
+ const st=/bossa[^|]*1/.test(s)?'bossa1':/bebop|be-bop|jazz bebop/.test(s)?'jazzbebop':/bossa|samba|latin|salsa|mambo|bolero|rumba/.test(s)?'bossa':/ballad/.test(s)?'ballad':/rock|metal|punk/.test(s)?'rock':/funk|soul|r&b|disco/.test(s)?'funk':/pop|country|folk|reggae|ska/.test(s)?'pop':'swing';
  const c=st=='bossa'?'Latim':/blues/.test(s)?'Blues':st=='rock'?'Rock':st=='pop'?'Pop':st=='funk'?'Funk':'Jazz';return[st,c]}
 function importText(txt){
  txt=txt.replace(/&amp;/g,'&');
@@ -637,7 +661,11 @@ $('#im-ok').onclick=async()=>{let t=$('#imt').value;for(const f of $('#imf').fil
 const IP='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',IS='<svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
 const info=()=>{$('#dI').innerHTML=`<b>${BPM}</b> bpm · ${CH}x · ${tr(S.k,T)}<small>${SL[SY]}</small>`};
 const PN={aj:'Ajustes',mx:'Mixer',ex:'Exportar',dg:'Diagramas e escalas'};
-function sheet(k){const sh=$('#sh');if(!sh.hidden&&sh.dataset.k==k){sh.hidden=true;return}sh.hidden=false;sh.dataset.k=k;$('#sht').textContent=PN[k];['aj','mx','ex','dg'].forEach(x=>$('#pn-'+x).hidden=x!=k)}
+function refreshTimeSignatureControls(){if(!S)return;const bars=parseBars(S.ch||'');const cur=Math.max(0,Math.min(bars.length-1,+$('#ts-bar').value||0));$('#ts-bar').innerHTML=bars.map((b,i)=>`<option value="${i}">Compasso ${i+1} · ${b.m}</option>`).join('');$('#ts-bar').value=String(cur);$('#ts-bar').disabled=$('#ts-scope').value!='bar';$('#ts-bar').parentElement.hidden=$('#ts-scope').value!='bar';$('#ts-value').value=bars[$('#ts-scope').value=='bar'?cur:0]?.m||'4/4'}
+function sheet(k){const sh=$('#sh');if(!sh.hidden&&sh.dataset.k==k){sh.hidden=true;return}sh.hidden=false;sh.dataset.k=k;$('#sht').textContent=PN[k];['aj','mx','ex','dg'].forEach(x=>$('#pn-'+x).hidden=x!=k);if(k=='aj')refreshTimeSignatureControls()}
+$('#ts-scope').onchange=()=>refreshTimeSignatureControls();$('#ts-bar').onchange=()=>{const b=parseBars(S?.ch||'')[+$('#ts-bar').value||0];if(b)$('#ts-value').value=b.m};
+$('#ts-apply').onclick=()=>{if(!S)return;const bars=parseBars(S.ch||'');if(!bars.length)return;const meter=$('#ts-value').value;if($('#ts-scope').value=='all'){bars.forEach((b,i)=>{if(i===0)b.ts=meter;else delete b.ts})}else{const i=Math.max(0,Math.min(bars.length-1,+$('#ts-bar').value||0));bars[i].ts=meter}if(!S.u){const copy={...S,u:1};USER.push(copy);S=copy}else if(!USER.includes(S))USER.push(S);S.ch=ser(bars);save();grid();updateStartChoices();refreshTimeSignatureControls();if(PL)restart();$('#pos').textContent='Fórmula aplicada e salva.'};
+document.addEventListener('click',e=>{const sh=$('#sh');if(!sh.hidden&&!sh.contains(e.target)&&!e.target.closest('#adjust-play,#inf,#mxb,#exb,#dgb'))sh.hidden=true});
 $('#inf').onclick=()=>sheet('aj');$('#mxb').onclick=()=>sheet('mx');$('#exb').onclick=()=>sheet('ex');$('#dgb').onclick=()=>sheet('dg');$('#shx').onclick=()=>$('#sh').hidden=true;
 const cx=q=>{const m=/(\/[A-G][b#]?)$/.exec(q),b=m?m[1]:'';q=q.replace(/\/[A-G][b#]?$/,'').replace(/[()]/g,'').replace(/^69/,'6add9').replace(/^(min|\^|-|h|o)?(.*)$/,(_,p,r)=>p=='min'?'m'+r:p=='^'?'maj'+(r||'7'):p=='-'?(/^\^/.test(r)?'mmaj'+(r.slice(1)||'7'):'m'+r):p=='h'?'m7b5'+r.replace(/^7/, ''):p=='o'?'dim'+r:r);return q+b};
 /* ---- Diagramas de acordes e escalas ---- */
@@ -688,6 +716,6 @@ $('#dgo').onchange=e=>{DG=e.target.value;drawDG()};
 $('#play').addEventListener('click',e=>{if(LOOP_DRAG_CLICK){e.preventDefault();e.stopPropagation();return}if(e.target.closest('.dock,.sheet,button,select,input,label,summary,#dg'))return;
  const sp=e.target.closest('.bar>span[data-c]');if(sp&&!PL){setDG(sp.dataset.c);return}
  document.body.classList.toggle('hm')});
-lib();if(!window.JSSynth)sfSt('engine NÃO carregada: confira se engine/js-synthesizer.min.js e engine/libfluidsynth-2.4.6.js existem com esses nomes.');else sfFetch();
+lib();if(!window.JSSynth)sfSt('engine NÃO carregada: confira se engine/js-synthesizer.min.js e engine/libfluidsynth-2.4.6.js existem com esses nomes.');else sfSt('SoundFont será carregado somente quando você iniciar a reprodução.');
 </script>
 </body></html>
