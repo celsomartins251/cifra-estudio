@@ -340,7 +340,8 @@ function gen(){
   pt.b.forEach(([p,g],j,Ls)=>{const a=at(p),cc=chordAt(a);if(!cc||cc=='NC')return;const[r,q]=rt(cc),iv=IV(q),nx=a<cs.length-1?(cs[a+1]||cc):(bars[ord[(idx+1)%ord.length]].c.find(Boolean)||cc);
    const pc=g=='r'?r:g=='3'?r+iv[1]:g=='5'?r+iv[2]:nx=='NC'?r:rt(nx)[0]-1,e=(j<Ls.length-1?Ls[j+1][0]:L)-p;
    ev.push({b:o+p,d:e*.9,k:'b',n:bn((pc+12)%12),v:100})});
-  for(let z=cs.length-1;z>=0;z--)if(cs[z]){carryChord=cs[z];break}\n  o+=L});
+  for(let z=cs.length-1;z>=0;z--)if(cs[z]){carryChord=cs[z];break}
+  o+=L});
  ev.sort((x,y)=>x.b-y.b);return{ev,n:o,marks,bars,b0}}
 let NBF;
 const nb=c=>c._nb||(c._nb=(()=>{const b=c.createBuffer(1,c.sampleRate,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;return b})());
