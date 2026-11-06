@@ -688,6 +688,6 @@ $('#dgo').onchange=e=>{DG=e.target.value;drawDG()};
 $('#play').addEventListener('click',e=>{if(LOOP_DRAG_CLICK){e.preventDefault();e.stopPropagation();return}if(e.target.closest('.dock,.sheet,button,select,input,label,summary,#dg'))return;
  const sp=e.target.closest('.bar>span[data-c]');if(sp&&!PL){setDG(sp.dataset.c);return}
  document.body.classList.toggle('hm')});
-lib();if(!window.JSSynth)sfSt('engine NÃO carregada: confira se engine/js-synthesizer.min.js e engine/libfluidsynth-2.4.6.js existem com esses nomes.');else sfFetch();
+lib();if(!window.JSSynth)sfSt('engine NÃO carregada: confira se engine/js-synthesizer.min.js e engine/libfluidsynth-2.4.6.js existem com esses nomes.');else sfSt('SoundFont será carregado somente quando você iniciar a reprodução.');
 </script>
 </body></html>
