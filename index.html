@@ -286,7 +286,8 @@ function parseBars(d){
   else if(m[5]){const k=m[5];if(k=='}'||k==']'||k=='Z')push(k);else{push();if(k=='{'||k=='[')b.bl=k}}
   else if(m[6])b.c.push('NC');
   else if(m[7]){const[,r,q]=/^([A-G][b#]?)(.*)$/.exec(m[7]);b.c.push(r+cx(q))}
-  else if(m[8]){const k=m[8];if(k=='S')b.seg=1;else if(k=='Q')b.cod=1;else if(k=='n')b.c.push('NC');else if(k=='x'||k=='r'||k=='%')b.rep=1}\n  else if(m[9])b.c.push('');
+  else if(m[8]){const k=m[8];if(k=='S')b.seg=1;else if(k=='Q')b.cod=1;else if(k=='n')b.c.push('NC');else if(k=='x'||k=='r'||k=='%')b.rep=1}
+  else if(m[9])b.c.push('');
   else if(t=='LZ')push();
   else if(t=='Kcl'){push();b.rep=1}}
  push();
