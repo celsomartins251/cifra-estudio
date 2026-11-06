@@ -102,7 +102,7 @@ dialog::backdrop{background:#0008}dialog label{display:grid;gap:4px;margin-botto
 <label>Tom<select id="tp"></select></label>
 <label>Estilo<select id="sy"></select></label>
 <label>Choruses<input id="ch" type="number" min="1" max="9" value="2"></label>
-<div><label class="ck"><input type="checkbox" id="lp">Repetir sem parar</label><label class="ck"><input type="checkbox" id="ci" checked>Contagem (1 compasso)</label></div>
+<div><label class="ck"><input type="checkbox" id="lp">Repetir sem parar</label><label class="ck"><input type="checkbox" id="ci" checked>Contagem (1 compasso)</label><label class="ck"><input type="checkbox" id="metro">Metrônomo junto com a base</label></div>
 <div style="grid-column:1/-1;display:grid;gap:6px"><label class="ck"><input type="checkbox" id="sf-use" checked>Usar SoundFont (sons reais)</label><div id="sf-status" class="mu" role="status">SoundFont: aguardando</div><label>Carregar SoundFont (.sf2) do aparelho<input type="file" id="sf-file" accept=".sf2,application/octet-stream"></label></div>
 </div></div><div class="pn" id="pn-mx" hidden><div class="mixgrid">
 <div class="mixch"><b>PIANO</b><output id="vpo">90%</output><div class="fader-rail"><input id="vp" type="range" min="0" max="1" step=".01" value=".9" aria-label="Volume do piano"></div><div class="mix-buttons"><button type="button" data-mute="p">MUTE</button><button type="button" data-solo="p">SOLO</button></div></div>
@@ -262,7 +262,7 @@ chacha:{two:1,p:[[1,0.3],[2,0.3],[3,0.3],[3.5,0.3],[5,0.3],[6,0.3],[7,0.3],[7.5,
 merengue:{cell:2,p:[[0.5,0.3],[1.5,0.3]],b:[[0,'r'],[1,'5']],d:{62:[0.5,1.5],64:[0,1],73:[0.0,0.25,0.5,0.75,1.0,1.25,1.5,1.75]},v:{62:[60,60],64:[100,100],73:[90,45,70,45,90,45,70,45]}},
 funk:{p:[[0,.4],[.75,.2],[1.5,.4],[2.5,.4],[3.25,.2]],b:[[0,'r'],[.75,'r'],[1.75,'5'],[2.5,'r'],[3.25,'r']],d:{36:[0,1.5,2.75],38:[1,3],42:E8}}};
 const VEL={36:100,38:85,37:70,42:55,51:65};
-let S,T=0,BPM=100,SY='swing',CH=2,CI=1,V={p:.9,b:.9,d:.7,r:.2,m:.85},MUTE={p:false,b:false,d:false,r:false,m:false},SOLO={p:false,b:false,d:false,r:false,m:false};
+let S,T=0,BPM=100,SY='swing',CH=2,CI=1,MC=0,V={p:.9,b:.9,d:.7,r:.2,m:.85},MUTE={p:false,b:false,d:false,r:false,m:false},SOLO={p:false,b:false,d:false,r:false,m:false};
 const bn=pc=>28+((pc-4+12)%12);
 
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -331,6 +331,7 @@ function gen(){
  for(let c=0;c<(LOOP_RANGE?1:CH);c++)ord.forEach((k,idx)=>{
   const bar=bars[k],L=bar.L,cs=bar.c,pt=pat(SY,L,bar.cmp,idx),at=p=>Math.min(cs.length-1,Math.floor(p/(L/cs.length)+1e-6));
   marks.push({b:o,i:k,c:c+1,m:bar.m});
+  if(MC){const [mn,md]=bar.m.split('/').map(Number),compound=md==8&&mn%3==0,step=compound?1.5:4/md,count=compound?mn/3:mn;for(let beat=0;beat<count;beat++)ev.push({b:o+beat*step,d:.075,k:'d',n:beat===0?77:76,v:beat===0?112:82})}
   for(const n in pt.d)pt.d[n].forEach((p,j)=>ev.push({b:o+p,d:.2,k:'d',n:+n,v:(pt.v&&pt.v[n]&&pt.v[n][j])||VEL[n]}));
   pt.p.forEach(([p,d])=>{const cc=cs[at(p)];if(cc=='NC')return;const[r,q]=rt(cc),iv=IV(q);ev.push({b:o+p,d,k:'p',n:48+r,v:50});
    iv.slice(1).forEach((x,j)=>{if(j==1&&iv.x&&x==7)return;ev.push({b:o+p,d,k:'p',n:60+(r+x%12)%12+(x>12?12:0),v:68})})});
@@ -382,7 +383,7 @@ function sfEnsure(){if(SFREADY)return Promise.resolve();if(SFLOAD)return SFLOAD;
   if(!SFDATA&&!await sfFetch())return;
   sfSt('inicializando FluidSynth…');await sfWasm();
   try{SFN&&SFN.disconnect()}catch(e){}if(SFS){try{SFS.close()}catch(e){}SFS=null}
-  SFS=new JSSynth.Synthesizer();SFS.init(SFC.sampleRate);SFN=SFC.createScriptProcessor(4096,0,2);SFN.onaudioprocess=sfProc;
+  SFS=new JSSynth.Synthesizer();SFS.init(SFC.sampleRate);SFN=SFC.createScriptProcessor(2048,0,2);SFN.onaudioprocess=sfProc;
   sfSt('carregando o SoundFont no motor… a tela pode ficar parada por alguns segundos');await sfTick();const id=await SFS.loadSFont(SFDATA);if(!id)throw Error('SoundFont inválido');
   SFS.setChannelType(9,true);SFS.midiProgramSelect(0,id,0,0);SFS.midiProgramSelect(1,id,0,32);SFS.midiSFontSelect(9,id);
   SFREADY=true;sfSt('ativo ('+(SFDATA.byteLength/1048576).toFixed(1)+' MB).')}
@@ -417,7 +418,7 @@ $('#sf-file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{if(P
 $('#sf-use').onchange=()=>{if(PL)startSF()};
 let ctx,O,PL,tm,raf,li=-1,LOOP_RANGE=null,DRAG_RANGE=null,DRAG_START=null,DRAG_MOVED=false,LOOP_DRAG_CLICK=false,LOOP_UI_OPEN=false;
 function pump(){const P=PL,now=ctx.currentTime;
- while(P.i<P.ev.length){const e=P.ev[P.i],t=P.t0+e.b*P.spb;if(t>now+(P.sf?.5:.3))break;(P.sf?sfVoice:voice)(ctx,O,e,Math.max(t,now),e.d*P.spb);P.i++}
+ while(P.i<P.ev.length){const e=P.ev[P.i],t=P.t0+e.b*P.spb;if(t>now+(P.sf?.75:.5))break;(P.sf?sfVoice:voice)(ctx,O,e,Math.max(t,now),e.d*P.spb);P.i++}
  const end=P.t0+P.n*P.spb;
  if(P.i>=P.ev.length&&now+.3>=end){if(LOOP_RANGE||$('#lp').checked){const g=gen2();P.t0=end;P.ev=g.ev;P.n=g.n;P.marks=g.marks;P.bars=g.bars;P.i=0}else if(now>end)stop()}}
 function gen2(){const s=CI;CI=0;const g=gen();CI=s;return g}
@@ -427,7 +428,7 @@ function anim(){if(!PL)return;const bt=(ctx.currentTime-PL.t0)/PL.spb,bs=$$('.ba
  else $('#pos').textContent='Contagem…';
  raf=requestAnimationFrame(anim)}
 function start(){stop();$('#sh').hidden=true;document.querySelectorAll('.pn').forEach(x=>x.hidden=true);const useSF=sfActive();ctx=useSF?SFC:new(window.AudioContext||window.webkitAudioContext)();if(useSF)SFC.resume();O=mk(ctx);if(useSF){try{SFN.disconnect()}catch(e){}SFN.connect(O.master)}const g=gen();
- PL={ev:g.ev,n:g.n,marks:g.marks,bars:g.bars,t0:ctx.currentTime+(useSF?.35:.2),i:0,spb:60/BPM,sf:useSF};if(useSF)sfMix();tm=setInterval(pump,40);raf=requestAnimationFrame(anim);$('#pl').innerHTML=IS;document.body.classList.add('pl','hm');scrollTo(0,0)}
+ PL={ev:g.ev,n:g.n,marks:g.marks,bars:g.bars,t0:ctx.currentTime+(useSF?.35:.2),i:0,spb:60/BPM,sf:useSF};if(useSF)sfMix();tm=setInterval(pump,20);raf=requestAnimationFrame(anim);$('#pl').innerHTML=IS;document.body.classList.add('pl','hm');scrollTo(0,0)}
 function stop(){clearInterval(tm);cancelAnimationFrame(raf);sfSilence();if(ctx){if(ctx===SFC)ctx.suspend().catch(()=>{});else ctx.close()}ctx=O=PL=null;$('#pl').innerHTML=IP;document.body.classList.remove('pl','hm');$('#pos').textContent='';$$('.bar').forEach(x=>x.classList.remove('cur'));li=-1}
 const restart=()=>{if(PL)start()};
 function chartHTML(bars,sel,editMode=false){return bars.map((b,i)=>{const[l,r]=ln(bars,i),[n,d]=b.m.split('/'),mk=(b.sec?`<span class="sc">${esc(b.sec)}</span>`:'')+(b.seg?SEG:'')+(b.cod?COD:'');
@@ -482,7 +483,7 @@ $('#bpm').oninput=e=>{BPM=+e.target.value;$('#bo').textContent=BPM+' bpm';info()
 $('#tp').onchange=e=>{T=+e.target.value;grid();restart()};
 $('#sy').onchange=e=>{SY=e.target.value;grid();restart()};
 $('#ch').onchange=e=>{CH=Math.max(1,Math.min(9,+e.target.value||1));e.target.value=CH;info();restart()};
-$('#ci').onchange=e=>{CI=e.target.checked?1:0;restart()};
+$('#ci').onchange=e=>{CI=e.target.checked?1:0;restart()};$('#metro').onchange=e=>{MC=e.target.checked?1:0;restart()};
 const MIX=[['vp','vpo','p'],['vb','vbo','b'],['vd','vdo','d'],['vr','vro','r'],['vm','vmo','m']];
 const soloActive=()=>Object.values(SOLO).some(Boolean);
 function syncGains(){if(!O)return;const now=ctx.currentTime;for(const k of ['p','b','d'])O[k].gain.setTargetAtTime((MUTE[k]||(soloActive()&&!SOLO[k]))?0:V[k],now,.035);O.wet.gain.setTargetAtTime((MUTE.r||(soloActive()&&!SOLO.r))?0:V.r,now,.035);O.master.gain.setTargetAtTime((MUTE.m||(soloActive()&&!SOLO.m))?0:V.m,now,.035);sfMix()}
