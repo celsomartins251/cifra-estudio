@@ -92,7 +92,7 @@ dialog::backdrop{background:#0008}dialog label{display:grid;gap:4px;margin-botto
 <div id="chips"></div><div id="sel-actions" hidden><span id="sel-name"></span><button id="sel-delete" class="song-del" type="button">Excluir música</button><button id="sel-cancel" type="button">Cancelar</button></div><ul id="list"></ul>
 </section>
 <section id="play" hidden>
-<div class="nav" style="display:flex;gap:8px"><button id="bk">← Biblioteca</button><button id="edt">Editar</button><button id="help-play" type="button">Ajuda</button></div>
+<div class="nav" style="display:flex;gap:8px"><button id="bk">← Biblioteca</button><button id="edt">Editar</button><button id="adjust-play" type="button">Ajustes</button></div>
 <h1 id="tt"></h1><div id="sub"></div>
 <div id="grid" aria-live="off"></div><div id="loop-tools" hidden><span id="loop-label">Arraste pelos compassos para selecionar um trecho.</span><button id="loop-play" type="button">Tocar loop</button><button id="loop-clear" type="button">Limpar seleção</button></div>
 <div id="dg" hidden></div>
@@ -274,7 +274,7 @@ const COD='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-wid
 function parseBars(d){
  /* Cifras entre parênteses são alternativas visuais no iReal Pro, não novos tempos; preserve texto de pauta entre <...>. */
  d=d.replace(/<[^>]*>|\([^)]*\)/g,x=>x[0]=='<'?x:'');
- const re=/<([^>]*)>|T(\d\d\d?)|\*([A-Za-z])|N(\d)|XyQ|Kcl|LZ|([\[\]{}Z|])|(N\.?C\.?)|([A-G][b#]?(?:min|sus|add|alt|maj|dim|aug|m|[-^+ho0-9#b]|\/[A-G][b#]?)*)|([xrpWnSQ%])|./g;
+ const re=/<([^>]*)>|T(\d\d\d?)|\*([A-Za-z])|N(\d)|XyQ|Kcl|LZ|([\[\]{}Z|])|(N\.?C\.?)|([A-G][b#]?(?:min|sus|add|alt|maj|dim|aug|m|[-^+ho0-9#b]|\/[A-G][b#]?)*)|([xrpWnSQ%])|(~)|./g;
  const bars=[];let b={c:[]},m;
  const has=x=>x.c.length||x.rep,push=br=>{if(has(b)){if(br)b.br=br;bars.push(b);b={c:[]}}else if(br&&bars.length&&!bars[bars.length-1].br)bars[bars.length-1].br=br};
  while(m=re.exec(d)){const t=m[0];
@@ -286,7 +286,7 @@ function parseBars(d){
   else if(m[5]){const k=m[5];if(k=='}'||k==']'||k=='Z')push(k);else{push();if(k=='{'||k=='[')b.bl=k}}
   else if(m[6])b.c.push('NC');
   else if(m[7]){const[,r,q]=/^([A-G][b#]?)(.*)$/.exec(m[7]);b.c.push(r+cx(q))}
-  else if(m[8]){const k=m[8];if(k=='S')b.seg=1;else if(k=='Q')b.cod=1;else if(k=='n')b.c.push('NC');else if(k=='x'||k=='r'||k=='%')b.rep=1}
+  else if(m[8]){const k=m[8];if(k=='S')b.seg=1;else if(k=='Q')b.cod=1;else if(k=='n')b.c.push('NC');else if(k=='x'||k=='r'||k=='%')b.rep=1}\n  else if(m[9])b.c.push('');
   else if(t=='LZ')push();
   else if(t=='Kcl'){push();b.rep=1}}
  push();
@@ -295,14 +295,14 @@ function fin(bars,keep){
  let mm='4/4',pm=null,e1=0,cur=0,cnt=0,lim=99;
  bars.forEach((x,i)=>{x.showTs=0;x.es=0;x.el=0;if(x.ts&&x.ts!=mm)x.showTs=1;if(x.ts)mm=x.ts;if(!i)x.showTs=1;x.m=mm;
   const[n,dn]=mm.split('/').map(Number);x.L=n*4/dn;x.cmp=dn==8&&n>=6&&n%3==0;
-  if(x.rep&&pm)x.c=pm.c.slice();if(!x.c.length&&!keep)x.c=['NC'];pm=x;
+  if(x.rep&&pm)x.c=pm.c.slice();pm=x;
   if(x.end){cur=x.end;cnt=0;x.el=1;lim=x.end==1?99:(e1||99)}else if(cur&&(x.sec||x.bl=='{'))cur=0;
   if(cur){cnt++;x.es=cur;if(x.br||cnt>=lim){if(cur==1)e1=cnt;cur=0}}});
  return bars}
 function ser(bars){const o=[];bars.forEach((b,i)=>{const pc=i&&bars[i-1].br;
  if(b.bl=='{'||b.bl=='[')o.push(b.bl);else if(i&&!pc)o.push('|');
  if(b.ts)o.push('T'+b.ts.replace('/',''));if(b.sec)o.push('*'+b.sec);if(b.secName&&b.txt!=b.secName)o.push('<'+b.secName+'>');if(b.seg)o.push('S');if(b.cod)o.push('Q');if(b.end)o.push('N'+b.end);if(b.txt)o.push('<'+b.txt+'>');
- if(b.rep)o.push('%');else{const last=b.c.reduce((a,c,i)=>c?a=i:a,-1);if(last>=0)o.push(Array.from({length:last+1},(_,j)=>{const c=b.c[j];return c?(c=='NC'?'N.C.':c):'N.C.'}).join(' '));}if(b.br)o.push(b.br)});return o.join(' ')}
+ if(b.rep)o.push('%');else{const last=b.c.reduce((a,c,i)=>c?a=i:a,-1);if(last>=0)o.push(Array.from({length:last+1},(_,j)=>{const c=b.c[j];return c?(c=='NC'?'N.C.':c):'~'}).join(' '));}if(b.br)o.push(b.br)});return o.join(' ')}
 const prep=(s,t)=>{const b=parseBars(s);b.forEach(x=>x.c=x.c.map(c=>c=='NC'?c:tr(c,t)));return b};
 function ln(bars,i){const b=bars[i],col=i%4,pc=i&&bars[i-1].br;
  const l=(col==0||!pc||b.bl)?(b.bl=='{'?'t3':b.bl=='['?'t2':'t1'):'';
@@ -326,20 +326,20 @@ function pat(st,L,cmp,bi){let s=cmp?((STY[st]&&STY[st].m68)||CP):STY[st];if(!cmp
  for(let f=0;f<L-.01;f+=cell){piano.forEach(([x,d])=>x+f<L&&o.p.push([x+f,d]));s.b.forEach(([x,g])=>x+f<L&&o.b.push([x+f,g]));
   for(const n in s.d){const vs=s.v&&s.v[n];s.d[n].forEach((x,j)=>{if(x+f<L){(o.d[n]=o.d[n]||[]).push(x+f);if(vs)((o.v=o.v||{})[n]=o.v[n]||[]).push(vs[j])}})}}return o}
 function gen(){
- const bars=prep(S.ch,T);let ord=seq(bars);const start=$('#start-at')?.value||'bar:0';let startBar=0;if(LOOP_RANGE){startBar=LOOP_RANGE[0];const[a,z]=LOOP_RANGE;ord=ord.filter(i=>i>=a&&i<=z);if(!ord.length)ord=Array.from({length:z-a+1},(_,j)=>a+j)}else{if(start.startsWith('bar:'))startBar=Math.max(0,Math.min(bars.length-1,+start.slice(4)||0));else if(start.startsWith('sec:')){const wanted=start.slice(4),found=bars.findIndex(b=>b.sec==wanted||b.secName==wanted);if(found>=0)startBar=found}const orderPos=ord.findIndex(i=>i>=startBar);if(orderPos>0)ord=ord.slice(orderPos);else if(orderPos<0)ord=ord.filter(i=>i>=startBar)}const ev=[],marks=[],b0=CI?Math.ceil((bars[startBar]||bars[0]).L):0;
+ const bars=prep(S.ch,T);let ord=seq(bars);const start=$('#start-at')?.value||'bar:0';let startBar=0;if(LOOP_RANGE){startBar=LOOP_RANGE[0];const[a,z]=LOOP_RANGE;ord=ord.filter(i=>i>=a&&i<=z);if(!ord.length)ord=Array.from({length:z-a+1},(_,j)=>a+j)}else{if(start.startsWith('bar:'))startBar=Math.max(0,Math.min(bars.length-1,+start.slice(4)||0));else if(start.startsWith('sec:')){const wanted=start.slice(4),found=bars.findIndex(b=>b.sec==wanted||b.secName==wanted);if(found>=0)startBar=found}const orderPos=ord.findIndex(i=>i>=startBar);if(orderPos>0)ord=ord.slice(orderPos);else if(orderPos<0)ord=ord.filter(i=>i>=startBar)}const ev=[],marks=[],b0=CI?Math.ceil((bars[startBar]||bars[0]).L):0;let carryChord='';
  if(CI)for(let i=0;i<b0;i++)ev.push({b:i,d:.2,k:'d',n:i?76:77,v:i?80:110});
  let o=b0;
  for(let c=0;c<(LOOP_RANGE?1:CH);c++)ord.forEach((k,idx)=>{
-  const bar=bars[k],L=bar.L,cs=bar.c,pt=pat(SY,L,bar.cmp,idx),at=p=>Math.min(cs.length-1,Math.floor(p/(L/cs.length)+1e-6));
+  const bar=bars[k],L=bar.L,cs=bar.c,pt=pat(SY,L,bar.cmp,idx),slots=Math.max(beatCount(bar),cs.length),at=p=>Math.min(slots-1,Math.floor(p/(L/slots)+1e-6)),chordAt=a=>{for(let z=Math.min(a,cs.length-1);z>=0;z--)if(cs[z])return cs[z];return carryChord};
   marks.push({b:o,i:k,c:c+1,m:bar.m});
   if(MC){const [mn,md]=bar.m.split('/').map(Number),compound=md==8&&mn%3==0,step=compound?1.5:4/md,count=compound?mn/3:mn;for(let beat=0;beat<count;beat++)ev.push({b:o+beat*step,d:.075,k:'d',n:beat===0?77:76,v:beat===0?112:82})}
   for(const n in pt.d)pt.d[n].forEach((p,j)=>ev.push({b:o+p,d:.2,k:'d',n:+n,v:(pt.v&&pt.v[n]&&pt.v[n][j])||VEL[n]}));
-  pt.p.forEach(([p,d])=>{const cc=cs[at(p)];if(cc=='NC')return;const[r,q]=rt(cc),iv=IV(q);ev.push({b:o+p,d,k:'p',n:48+r,v:50});
+  pt.p.forEach(([p,d])=>{const cc=chordAt(at(p));if(!cc||cc=='NC')return;const[r,q]=rt(cc),iv=IV(q);ev.push({b:o+p,d,k:'p',n:48+r,v:50});
    iv.slice(1).forEach((x,j)=>{if(j==1&&iv.x&&x==7)return;ev.push({b:o+p,d,k:'p',n:60+(r+x%12)%12+(x>12?12:0),v:68})})});
-  pt.b.forEach(([p,g],j,Ls)=>{const a=at(p),cc=cs[a];if(cc=='NC')return;const[r,q]=rt(cc),iv=IV(q),nx=a<cs.length-1?cs[a+1]:bars[ord[(idx+1)%ord.length]].c[0];
+  pt.b.forEach(([p,g],j,Ls)=>{const a=at(p),cc=chordAt(a);if(!cc||cc=='NC')return;const[r,q]=rt(cc),iv=IV(q),nx=a<cs.length-1?(cs[a+1]||cc):(bars[ord[(idx+1)%ord.length]].c.find(Boolean)||cc);
    const pc=g=='r'?r:g=='3'?r+iv[1]:g=='5'?r+iv[2]:nx=='NC'?r:rt(nx)[0]-1,e=(j<Ls.length-1?Ls[j+1][0]:L)-p;
    ev.push({b:o+p,d:e*.9,k:'b',n:bn((pc+12)%12),v:100})});
-  o+=L});
+  for(let z=cs.length-1;z>=0;z--)if(cs[z]){carryChord=cs[z];break}\n  o+=L});
  ev.sort((x,y)=>x.b-y.b);return{ev,n:o,marks,bars,b0}}
 let NBF;
 const nb=c=>c._nb||(c._nb=(()=>{const b=c.createBuffer(1,c.sampleRate,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;return b})());
@@ -477,7 +477,7 @@ $('#list').onkeydown=e=>{const row=e.target.closest('li[data-i]');if(!row)return
 function updateStartChoices(){const sel=$('#start-at');if(!sel||!S)return;const prev=sel.value,bars=prep(S.ch,T),opts=[['bar:0','Compasso 1']];bars.forEach((b,i)=>opts.push([`bar:${i}`,`Compasso ${i+1}`]));const seen=new Set();bars.forEach((b,i)=>{const k=b.secName||b.sec;if(k&&!seen.has(k)){seen.add(k);const key=b.sec||k,label=b.secName||({'I':'Introdução','T':'Tema','V':'Verso'}[key]||`Trecho ${key}`);opts.push([`sec:${key}`,`Trecho ${label} (compasso ${i+1})`])}});sel.innerHTML=opts.map(([v,l])=>`<option value="${esc(v)}">${esc(l)}</option>`).join('');sel.value=opts.some(([v])=>v==prev)?prev:'bar:0'}
 $('#start-at').onchange=()=>{if(PL)start()};
 $('#section-apply').onclick=()=>{const choice=$('#section-mark').value,b=eb();if(!choice){b.sec=undefined;b.secName=undefined}else{const map={'Introdução':'I','Intro':'I','Tema':'T','Verso':'V','Refrão':'R'};b.sec=map[choice]||choice;b.secName=choice;if(['Introdução','Tema','Verso','Refrão'].includes(choice))b.txt=choice}erender();updateStartChoices();$('#emsg').textContent=choice?`Trecho ${choice} marcado no compasso ${SEL+1}.`:'Marcação removida.'};
-$('#help-open').onclick=()=>$('#help-dialog').showModal();$('#help-play').onclick=()=>$('#help-dialog').showModal();$('#help-editor').onclick=()=>$('#help-dialog').showModal();$('#help-close').onclick=()=>$('#help-dialog').close();
+$('#help-open').onclick=()=>$('#help-dialog').showModal();$('#adjust-play').onclick=()=>sheet('aj');$('#help-editor').onclick=()=>$('#help-dialog').showModal();$('#help-close').onclick=()=>$('#help-dialog').close();
 $('#bk').onclick=()=>{stop();show('lib')};
 $('#pl').onclick=()=>PL?stop():startSF();
 $('#bpm').oninput=e=>{BPM=+e.target.value;$('#bo').textContent=BPM+' bpm';info()};$('#bpm').onchange=restart;
