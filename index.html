@@ -134,7 +134,7 @@ dialog::backdrop{background:#0008}dialog label{display:grid;gap:4px;margin-botto
 <div style="display:flex;justify-content:flex-end;margin-top:12px"><button id="help-close">Fechar</button></div>
 </dialog>
 <dialog id="ed">
-<div class="eh"><button id="ed-x" aria-label="Voltar">←</button><b style="flex:1" id="eh">Editor</b><button id="kb-mode" class="kb-mode" type="button">Teclado: app</button><button id="help-editor" type="button" aria-label="Ajuda">?</button><button id="ed-i" aria-label="Detalhes da música">ⓘ</button><button class="main" id="ed-ok">Salvar</button></div>
+<div class="eh"><button id="ed-x" aria-label="Voltar">←</button><b style="flex:1" id="eh">Editor</b><button id="kb-mode" class="kb-mode" type="button">Teclado: app</button><button id="ed-i" aria-label="Detalhes da música">ⓘ</button><button class="main" id="ed-ok">Salvar</button></div>
 <details id="eio"><summary>Detalhes da música</summary>
 <label>Título<input type="text" id="et"></label><label>Compositor / origem<input type="text" id="ea"></label>
 <div class="ctl" style="margin:0 0 8px"><label>Categoria<select id="ec"></select></label><label>Estilo<select id="es"></select></label><label>Andamento (bpm)<input type="number" id="eb" value="100" min="40" max="300"></label><label>Playlist<select id="ep-list"></select></label><button id="ep-new" type="button">+ Criar playlist</button></div>
@@ -480,7 +480,7 @@ $('#list').onkeydown=e=>{const row=e.target.closest('li[data-i]');if(!row)return
 function updateStartChoices(){const sel=$('#start-at');if(!sel||!S)return;const prev=sel.value,bars=prep(S.ch,T),opts=[['bar:0','Compasso 1']];bars.forEach((b,i)=>opts.push([`bar:${i}`,`Compasso ${i+1}`]));const seen=new Set();bars.forEach((b,i)=>{const k=b.secName||b.sec;if(k&&!seen.has(k)){seen.add(k);const key=b.sec||k,label=b.secName||({'I':'Introdução','T':'Tema','V':'Verso'}[key]||`Trecho ${key}`);opts.push([`sec:${key}`,`Trecho ${label} (compasso ${i+1})`])}});sel.innerHTML=opts.map(([v,l])=>`<option value="${esc(v)}">${esc(l)}</option>`).join('');sel.value=opts.some(([v])=>v==prev)?prev:'bar:0'}
 $('#start-at').onchange=()=>{if(PL)start()};
 $('#section-apply').onclick=()=>{const choice=$('#section-mark').value,b=eb();if(!choice){b.sec=undefined;b.secName=undefined}else{const map={'Introdução':'I','Intro':'I','Tema':'T','Verso':'V','Refrão':'R'};b.sec=map[choice]||choice;b.secName=choice;if(['Introdução','Tema','Verso','Refrão'].includes(choice))b.txt=choice}erender();updateStartChoices();$('#emsg').textContent=choice?`Trecho ${choice} marcado no compasso ${SEL+1}.`:'Marcação removida.'};
-$('#help-open').onclick=()=>$('#help-dialog').showModal();$('#adjust-play').onclick=()=>sheet('aj');$('#help-editor').onclick=()=>$('#help-dialog').showModal();$('#help-close').onclick=()=>$('#help-dialog').close();
+$('#help-open').onclick=()=>$('#help-dialog').showModal();$('#adjust-play').onclick=()=>sheet('aj');$('#help-close').onclick=()=>$('#help-dialog').close();
 $('#bk').onclick=()=>{stop();show('lib')};
 $('#pl').onclick=()=>PL?stop():startSF();
 $('#bpm').oninput=e=>{BPM=+e.target.value;$('#bo').textContent=BPM+' bpm';info()};$('#bpm').onchange=restart;
