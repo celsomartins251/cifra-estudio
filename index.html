@@ -201,7 +201,8 @@ const pr=c=>{if(c=='NC')return'<span class="nc">N.C.</span>';const m=/^([A-G][b#
  s=fm(h.replace('m7b5','ø7').replace('maj','Δ').replace(/^m$/,'-').replace('dim','o')+r.replace(re,'')+al.join(''));
  return m[1].replace('b','♭').replace('#','♯')+(s?'<sup>'+s+'</sup>':'')+(m[3]?'<small>'+fm(m[3])+'</small>':'')};
 const SL={swing:'Swing',ballad:'Balada',rock:'Rock',pop:'Pop',funk:'Funk',vaneira:'Vaneira',arrocha:'Arrocha',axe1:'Axé 1',axe2:'Axé 2',superbalada:'Super Balada',guarania:'Guarânia',afoxe:'Afoxé',arrocha2:'Arrocha 2',avioes:'Aviões',baiao:'Baião',natiruts:'Natiruts',pop6:'Pop 6',reggae:'Reggae',pagodao:'Pagodão',bolero:'Bolero',pop16:'Pop 16avos',popdance:'Pop Dance',rockshuffle:'Rock Shuffle',rockbalada:'Rock Balada',reggaeonedrop:'Reggae One Drop',reggaesteppers:'Reggae Steppers',funk16:'Funk 16',funksoul:'Funk Soul',blues68:'Blues 6/8',salsa:'Salsa',mambo:'Mambo',chacha:'Cha-cha-chá',merengue:'Merengue',bossanova:'Bossa Nova',airegin:'Airegin',alfie:'Alfie\'s Theme',blues3:'502 Blues (3/4)'};
-const BR_STYLE_KEYS=new Set(['bossanova','vaneira','arrocha','axe1','axe2','superbalada','guarania','afoxe','arrocha2','avioes','baiao','pagodao','bolero','pagode','samba','samba1','samba2','maracatu','xaxado','chote','piseiro','vaneira']);\nconst CATS=['Todas','Jazz','Blues','Latim','Brasileiros','Pop','Rock','Funk','Minhas'];
+const BR_STYLE_KEYS=new Set(['bossanova','vaneira','arrocha','axe1','axe2','superbalada','guarania','afoxe','arrocha2','avioes','baiao','pagodao','bolero','pagode','samba','samba1','samba2','maracatu','xaxado','chote','piseiro','vaneira']);
+const CATS=['Todas','Jazz','Blues','Latim','Brasileiros','Pop','Rock','Funk','Minhas'];
 const RA='Bb G7|Cm7 F7|Dm7 G7|Cm7 F7|Fm7 Bb7|Eb6 Ebm7|Dm7 G7|Cm7 F7';
 const S0=(t,a,c,s,bpm,k,ch)=>({t,a,c,s,bpm,k,ch});
 const SONGS=[
