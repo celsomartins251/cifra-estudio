@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="utf-8">
+<link rel="manifest" href="./manifest.webmanifest">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Cifra Estúdio — Backing tracks para estudo</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -84,7 +85,7 @@ dialog{width:min(560px,94vw);background:var(--bg);border:1px solid var(--ln);bor
 dialog::backdrop{background:#0008}dialog label{display:grid;gap:4px;margin-bottom:10px;font-size:.85rem;color:var(--mu)}
 #msg{min-height:1.4em;color:var(--mu);margin-top:8px;font-size:.9rem}
 </style></head><body>
-<header><span class="logo">♩ Cifra Estúdio</span><span><button id="help-open" type="button" aria-label="Ajuda">Ajuda</button> <button id="im-b">Importar arquivos</button> <button id="nw">+ Nova</button></span></header>
+<header><span class="logo">♩ Cifra Estúdio</span><span><button id="offline-btn" type="button">Preparar offline</button> <button id="help-open" type="button" aria-label="Ajuda">Ajuda</button> <button id="im-b">Importar arquivos</button> <button id="nw">+ Nova</button></span></header>
 <main>
 <section id="lib">
 <input id="q" type="search" placeholder="Buscar música ou compositor…" aria-label="Buscar">
@@ -689,5 +690,34 @@ $('#play').addEventListener('click',e=>{if(LOOP_DRAG_CLICK){e.preventDefault();e
  const sp=e.target.closest('.bar>span[data-c]');if(sp&&!PL){setDG(sp.dataset.c);return}
  document.body.classList.toggle('hm')});
 lib();if(!window.JSSynth)sfSt('engine NÃO carregada: confira se engine/js-synthesizer.min.js e engine/libfluidsynth-2.4.6.js existem com esses nomes.');else sfFetch();
+</script>
+
+<script>
+/* ---- Modo offline: cache do aplicativo e preparação dos recursos de áudio ---- */
+(()=> {
+ const btn=document.getElementById('offline-btn');
+ if(!('serviceWorker' in navigator) || !btn) { if(btn) btn.disabled=true; return; }
+ const status=document.createElement('small');
+ status.id='offline-status'; status.style.cssText='display:block;font-size:.72rem;color:var(--mu);text-align:right;padding:0 4px';
+ btn.parentElement.appendChild(status);
+ const say=t=>status.textContent=t;
+ navigator.serviceWorker.register('./service-worker.js').then(async reg=>{
+   await navigator.serviceWorker.ready;
+   say('Offline: disponível para preparar');
+   btn.addEventListener('click',()=>{
+     const worker=navigator.serviceWorker.controller||reg.active;
+     if(!worker){say('Reabra o aplicativo para preparar o modo offline.');return}
+     btn.disabled=true; say('Baixando recursos para uso offline…');
+     worker.postMessage({type:'CACHE_FULL'});
+   });
+   navigator.serviceWorker.addEventListener('message',e=>{
+     if(!e.data)return;
+     if(e.data.type==='CACHE_PROGRESS')say('Preparando offline: '+e.data.done+'/'+e.data.total);
+     if(e.data.type==='CACHE_DONE'){say('Pronto: aplicativo disponível offline');btn.disabled=false;btn.textContent='Offline preparado';}
+     if(e.data.type==='CACHE_ERROR'){say('Falha no preparo offline: '+e.data.message);btn.disabled=false;}
+   });
+   reg.update().catch(()=>{});
+ }).catch(e=>say('Modo offline indisponível neste endereço.'));
+})();
 </script>
 </body></html>
