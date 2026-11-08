@@ -1,5 +1,5 @@
 const VERSION='cifra-estudio-original-offline-v1';
-const SHELL=[ './', './index.html', './fluidsynth-engine.js',
+const SHELL=[ './', './index.html', './manifest.webmanifest', './fluidsynth-engine.js',
  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
  'https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js'
 ];
