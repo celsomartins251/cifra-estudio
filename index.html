@@ -336,7 +336,7 @@ function gen(){
  if(CI)for(let i=0;i<b0;i++)ev.push({b:i,d:.2,k:'d',n:i?76:77,v:i?80:110});
  let o=b0;
  for(let c=0;c<(LOOP_RANGE?1:CH);c++)ord.forEach((k,idx)=>{
-  const bar=bars[k],L=bar.L,cs=bar.c,pt=pat(SY,L,bar.cmp,idx);if(['bossanova','airegin','alfie','blues3'].includes(SY)){const chordSlots=cs.filter(x=>x&&x!=='NC').length;pt.p=chordSlots?Array.from({length:chordSlots},(_,i)=>[i*(L/chordSlots),(L/chordSlots)*.98]):[]}const at=p=>Math.min(cs.length-1,Math.floor(p/(L/cs.length)+1e-6));
+  const bar=bars[k],L=bar.L,cs=bar.c,pt=pat(SY,L,bar.cmp,idx);if(['bossanova','airegin','alfie','blues3'].includes(SY)){const chordSlots=cs.length;pt.p=chordSlots?Array.from({length:chordSlots},(_,i)=>[i*(L/chordSlots),(L/chordSlots)*.98]):[]}const at=p=>Math.min(cs.length-1,Math.floor(p/(L/cs.length)+1e-6));
   marks.push({b:o,i:k,c:c+1,m:bar.m});
   for(const n in pt.d)pt.d[n].forEach((p,j)=>ev.push({b:o+p,d:.2,k:'d',n:+n,v:(pt.v&&pt.v[n]&&pt.v[n][j])||VEL[n]}));
   pt.p.forEach(([p,d])=>{const cc=cs[at(p)];if(cc=='NC')return;const[r,q]=rt(cc),iv=IV(q);ev.push({b:o+p,d,k:'p',n:48+r,v:50});
