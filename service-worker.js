@@ -1,4 +1,4 @@
-const VERSION='cifra-estudio-original-offline-v3-piano-sustained';
+const VERSION='cifra-estudio-original-offline-v4-top-controls-longpress';
 const SHELL=[ './', './index.html', './manifest.webmanifest', './fluidsynth-engine.js',
  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
  'https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js'
