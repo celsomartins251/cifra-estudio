@@ -220,7 +220,11 @@ S0("Rock'n'Roll I–vi–IV–V em C",'Progressão dos anos 50','Rock','rock',15
 S0('Funk de 2 acordes em Em','Original de estudo','Funk','funk',100,'Em','Em7|Em7|A7|A7'),
 S0('Valsa em Am (3/4)','Original de estudo','Jazz','swing',130,'Am','T34 {*A Am7|Dm7|E7|N1 Am7 }|N2 Am7 Am6|*B Dm7|G7|Cmaj7|Fmaj7|Bm7b5|E7|Am7|N.C.|%|Z'),
 S0('Estudo: ritornelo, Segno e Coda','Original de estudo','Jazz','swing',120,'C','T44 {*A Cmaj7|Am7|Dm7|G7 }|*B S Fmaj7|Em7 A7|Dm7 Q G7|Cmaj7 <D.S. al Coda>|Q C6|N.C.|%|Z'),
-S0('Blues Lento em 12/8 (E)','Forma tradicional','Blues','swing',90,'E','T128 E7|E7|E7|E7|A7|A7|E7|E7|B7|A7|E7|B7|Z'),\nS0('Teste de ritmo — Bossa Nova','Padrão baseado em Bossa Rokka','Latim','bossanova',120,'C','Cmaj7|Dm7 G7|Cmaj7|Am7 D7|Dm7 G7|Cmaj7|Am7|Dm7 G7'),\nS0('Teste de ritmo — Airegin','Padrão baseado em Airegin','Jazz','airegin',160,'Cm','Cm7|Cm7|Fm7|Fm7|Dm7b5|G7|Cm7|G7'),\nS0('Teste de ritmo — Alfie\'s Theme','Padrão baseado em Alfie\'s Theme','Jazz','alfie',120,'C','Cmaj7|Am7|Dm7|G7|Em7 A7|Dm7 G7|Cmaj7|Cmaj7'),\nS0('Teste de ritmo — 502 Blues (3/4)','Padrão ternário baseado em 502 Blues','Blues','blues3',120,'C','T34 C7|F7|C7|G7|F7|C7')];
+S0('Blues Lento em 12/8 (E)','Forma tradicional','Blues','swing',90,'E','T128 E7|E7|E7|E7|A7|A7|E7|E7|B7|A7|E7|B7|Z'),
+S0('Teste de ritmo — Bossa Nova','Padrão baseado em Bossa Rokka','Latim','bossanova',120,'C','Cmaj7|Dm7 G7|Cmaj7|Am7 D7|Dm7 G7|Cmaj7|Am7|Dm7 G7'),
+S0('Teste de ritmo — Airegin','Padrão baseado em Airegin','Jazz','airegin',160,'Cm','Cm7|Cm7|Fm7|Fm7|Dm7b5|G7|Cm7|G7'),
+S0('Teste de ritmo — Alfie\'s Theme','Padrão baseado em Alfie\'s Theme','Jazz','alfie',120,'C','Cmaj7|Am7|Dm7|G7|Em7 A7|Dm7 G7|Cmaj7|Cmaj7'),
+S0('Teste de ritmo — 502 Blues (3/4)','Padrão ternário baseado em 502 Blues','Blues','blues3',120,'C','T34 C7|F7|C7|G7|F7|C7')];
 let USER=[];try{USER=JSON.parse(localStorage.getItem('cs_user')||'[]')}catch(e){}
 USER.forEach(song=>{if(song&&song.s==='bossa')song.s='swing'});try{localStorage.setItem('cs_user',JSON.stringify(USER))}catch(e){}
 let PLAYLISTS=[];try{PLAYLISTS=JSON.parse(localStorage.getItem('cs_playlists')||'[]')}catch(e){}
