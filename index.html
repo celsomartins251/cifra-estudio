@@ -39,7 +39,7 @@ li span,li small,.mu,#sub{color:var(--mu)}
 .en{position:absolute;left:0;right:0;top:3px;height:17px;border-top:2px solid var(--ac);font:600 .75rem/15px system-ui;color:var(--ac);padding-left:6px}.en.f{border-left:2px solid var(--ac)}
 .ts{position:absolute;left:8px;top:50%;transform:translateY(-50%);display:grid;font:700 1.15rem/1.05 system-ui;color:var(--ac);text-align:center}.ts b:first-child{border-bottom:2px solid var(--ac)}
 .rp{width:1.5em;height:1.5em;fill:currentColor}.nc{font:700 .8em system-ui}
-.bar.cur{background:var(--hi)}#grid .bar{touch-action:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none}#grid .bar.loop-selected{outline:3px solid var(--ac);outline-offset:2px;background:color-mix(in srgb,var(--ac) 18%,var(--card))}#loop-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:4px 0 10px;padding:8px 10px;border:1px solid var(--ln);border-radius:12px;background:var(--card);font-size:.88rem}#loop-tools[hidden]{display:none}#loop-tools button{min-height:38px;padding:6px 10px}
+.bar.cur{background:var(--hi)}#grid .bar{touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-user-drag:none}#grid .bar.loop-selected{outline:3px solid var(--ac);outline-offset:2px;background:color-mix(in srgb,var(--ac) 18%,var(--card))}#loop-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:4px 0 10px;padding:8px 10px;border:1px solid var(--ln);border-radius:12px;background:var(--card);font-size:.88rem}#loop-tools[hidden]{display:none}#loop-tools button{min-height:38px;padding:6px 10px}
 sup{font-size:.62em;font-weight:600}
 h1{margin:6px 0 0;font-size:1.5rem}
 .tr{display:flex;gap:10px;align-items:center;margin:8px 0}.tr .main{flex:1;font-size:1.1rem}
@@ -93,11 +93,11 @@ dialog::backdrop{background:#0008}dialog label{display:grid;gap:4px;margin-botto
 <div id="chips"></div><div id="sel-actions" hidden><span id="sel-name"></span><button id="sel-delete" class="song-del" type="button">Excluir música</button><button id="sel-cancel" type="button">Cancelar</button></div><ul id="list"></ul>
 </section>
 <section id="play" hidden>
-<div class="nav" style="display:flex;gap:8px"><button id="bk">← Biblioteca</button><button id="edt">Editar</button><button id="help-play" type="button">Ajuda</button></div>
+<div class="nav" style="display:flex;gap:8px;align-items:center"><button id="bk">← Biblioteca</button><button id="edt">Editar</button><button id="settings-open" type="button">Ajustes</button></div>
 <h1 id="tt"></h1><div id="sub"></div>
 <div id="grid" aria-live="off"></div><div id="loop-tools" hidden><span id="loop-label">Arraste pelos compassos para selecionar um trecho.</span><button id="loop-play" type="button">Tocar loop</button><button id="loop-clear" type="button">Limpar seleção</button></div>
 <div id="dg" hidden></div>
-<div class="dock"><button class="side inf" id="inf" aria-label="Ajustes: andamento, tom e estilo"><span id="dI"></span></button><button class="pbtn" id="pl" aria-label="Tocar ou parar"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button><span class="side ic"><button id="dgb" aria-label="Diagramas e escalas"><svg viewBox="0 0 24 24"><path d="M5 4v16M10 4v16M15 4v16M20 4v16M5 9h15M5 15h15"/></svg></button><button id="mxb" aria-label="Mixer"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button><button id="exb" aria-label="Exportar"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg></button></span><span id="pos"></span></div>
+<div class="dock"><span class="side inf" id="inf" aria-label="Andamento, tom e estilo"><span id="dI"></span></span><button class="pbtn" id="pl" aria-label="Tocar ou parar"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button><span class="side ic"><button id="dgb" aria-label="Diagramas e escalas"><svg viewBox="0 0 24 24"><path d="M5 4v16M10 4v16M15 4v16M20 4v16M5 9h15M5 15h15"/></svg></button><button id="mxb" aria-label="Mixer"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button><button id="exb" aria-label="Exportar"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg></button></span><span id="pos"></span></div>
 <div class="sheet" id="sh" hidden><div class="shh"><b id="sht"></b><button id="shx" aria-label="Fechar">✕</button></div><div class="pn" id="pn-aj"><div class="ctl">
 <label class="w">Andamento: <output id="bo"></output><input id="bpm" type="range" min="40" max="300"></label><label class="w">Começar a tocar em<select id="start-at"><option value="bar:0">Compasso 1</option></select></label>
 <label>Tom<select id="tp"></select></label>
@@ -134,7 +134,7 @@ dialog::backdrop{background:#0008}dialog label{display:grid;gap:4px;margin-botto
 <div style="display:flex;justify-content:flex-end;margin-top:12px"><button id="help-close">Fechar</button></div>
 </dialog>
 <dialog id="ed">
-<div class="eh"><button id="ed-x" aria-label="Voltar">←</button><b style="flex:1" id="eh">Editor</b><button id="kb-mode" class="kb-mode" type="button">Teclado: app</button><button id="help-editor" type="button" aria-label="Ajuda">?</button><button id="ed-i" aria-label="Detalhes da música">ⓘ</button><button class="main" id="ed-ok">Salvar</button></div>
+<div class="eh"><button id="ed-x" aria-label="Voltar">←</button><b style="flex:1" id="eh">Editor</b><button id="kb-mode" class="kb-mode" type="button">Teclado: app</button><button id="ed-i" aria-label="Detalhes da música">ⓘ</button><button class="main" id="ed-ok">Salvar</button></div>
 <details id="eio"><summary>Detalhes da música</summary>
 <label>Título<input type="text" id="et"></label><label>Compositor / origem<input type="text" id="ea"></label>
 <div class="ctl" style="margin:0 0 8px"><label>Categoria<select id="ec"></select></label><label>Estilo<select id="es"></select></label><label>Andamento (bpm)<input type="number" id="eb" value="100" min="40" max="300"></label><label>Playlist<select id="ep-list"></select></label><button id="ep-new" type="button">+ Criar playlist</button></div>
@@ -448,10 +448,14 @@ function grid(){const bars=prep(S.ch,T);$('#grid').innerHTML=chartHTML(bars,-1);
 function updateLoopUI(){const tools=$('#loop-tools');const r=DRAG_RANGE||LOOP_RANGE;if(!S||!LOOP_UI_OPEN){tools.hidden=true;return}tools.hidden=false;if(r){$('#loop-label').textContent=`Trecho selecionado: compassos ${r[0]+1}–${r[1]+1}${LOOP_RANGE?' · loop ativo':''}`;$('#loop-play').textContent='Tocar loop'}else{$('#loop-label').textContent='Arraste pelos compassos para selecionar um trecho.';$('#loop-play').textContent='Tocar loop'}}
 function paintLoopRange(range){$$('#grid .bar').forEach((el,i)=>el.classList.toggle('loop-selected',!!range&&i>=range[0]&&i<=range[1]))}
 function barAtPoint(x,y){const el=document.elementFromPoint(x,y);const b=el&&el.closest('#grid .bar');return b?+b.dataset.i:null}
-$('#grid').addEventListener('pointerdown',e=>{const bar=e.target.closest('.bar');if(!bar||e.button!==undefined&&e.button!==0)return;LOOP_UI_OPEN=true;DRAG_START=+bar.dataset.i;DRAG_RANGE=[DRAG_START,DRAG_START];DRAG_MOVED=false;updateLoopUI();try{$('#grid').setPointerCapture(e.pointerId)}catch(_){} });
-$('#grid').addEventListener('pointermove',e=>{if(DRAG_START===null)return;const i=barAtPoint(e.clientX,e.clientY);if(i===null)return;if(i!==DRAG_START)DRAG_MOVED=true;if(DRAG_MOVED){DRAG_RANGE=[Math.min(DRAG_START,i),Math.max(DRAG_START,i)];paintLoopRange(DRAG_RANGE);updateLoopUI();e.preventDefault()}});
-function endLoopDrag(e){if(DRAG_START===null)return;if(DRAG_MOVED&&DRAG_RANGE){LOOP_RANGE=DRAG_RANGE.slice();paintLoopRange(LOOP_RANGE);updateLoopUI();LOOP_DRAG_CLICK=true;setTimeout(()=>LOOP_DRAG_CLICK=false,400)}else{LOOP_RANGE=DRAG_RANGE?DRAG_RANGE.slice():null;DRAG_RANGE=null;paintLoopRange(LOOP_RANGE);updateLoopUI()}DRAG_START=null;DRAG_MOVED=false}
-$('#grid').addEventListener('pointerup',endLoopDrag);$('#grid').addEventListener('pointercancel',endLoopDrag);
+let LOOP_HOLD_TIMER=null,LOOP_HOLD_PENDING=false,LOOP_HOLD_ACTIVE=false,LOOP_HOLD_POINTER=null,LOOP_HOLD_X=0,LOOP_HOLD_Y=0;
+function cancelLoopHold(){if(LOOP_HOLD_TIMER!==null)clearTimeout(LOOP_HOLD_TIMER);LOOP_HOLD_TIMER=null;LOOP_HOLD_PENDING=false;LOOP_HOLD_ACTIVE=false;LOOP_HOLD_POINTER=null}
+$('#grid').addEventListener('pointerdown',e=>{const bar=e.target.closest('.bar');if(!bar||e.button!==undefined&&e.button!==0)return;cancelLoopHold();DRAG_START=+bar.dataset.i;DRAG_RANGE=null;DRAG_MOVED=false;LOOP_HOLD_PENDING=true;LOOP_HOLD_POINTER=e.pointerId;LOOP_HOLD_X=e.clientX;LOOP_HOLD_Y=e.clientY;
+ LOOP_HOLD_TIMER=setTimeout(()=>{if(!LOOP_HOLD_PENDING)return;LOOP_HOLD_PENDING=false;LOOP_HOLD_ACTIVE=true;LOOP_UI_OPEN=true;DRAG_RANGE=[DRAG_START,DRAG_START];paintLoopRange(DRAG_RANGE);updateLoopUI();try{$('#grid').setPointerCapture(LOOP_HOLD_POINTER)}catch(_){}},2000);
+});
+$('#grid').addEventListener('pointermove',e=>{if(LOOP_HOLD_PENDING){if(Math.hypot(e.clientX-LOOP_HOLD_X,e.clientY-LOOP_HOLD_Y)>10)cancelLoopHold();return}if(!LOOP_HOLD_ACTIVE||DRAG_START===null)return;const i=barAtPoint(e.clientX,e.clientY);if(i===null)return;if(i!==DRAG_START){DRAG_MOVED=true;DRAG_RANGE=[Math.min(DRAG_START,i),Math.max(DRAG_START,i)];paintLoopRange(DRAG_RANGE);updateLoopUI();e.preventDefault()}});
+function endLoopDrag(){if(LOOP_HOLD_PENDING){cancelLoopHold();DRAG_START=null;DRAG_RANGE=null;return}if(!LOOP_HOLD_ACTIVE||DRAG_START===null)return;if(DRAG_RANGE){LOOP_RANGE=DRAG_RANGE.slice();paintLoopRange(LOOP_RANGE);updateLoopUI();LOOP_DRAG_CLICK=true;setTimeout(()=>LOOP_DRAG_CLICK=false,500)}cancelLoopHold();DRAG_START=null;DRAG_MOVED=false}
+$('#grid').addEventListener('pointerup',endLoopDrag);$('#grid').addEventListener('pointercancel',()=>{cancelLoopHold();DRAG_START=null;DRAG_RANGE=null;DRAG_MOVED=false});
 $('#loop-play').onclick=()=>{if(!DRAG_RANGE&&!LOOP_RANGE){$('#loop-label').textContent='Toque num compasso ou arraste pelo trecho que quer repetir.';LOOP_UI_OPEN=true;updateLoopUI();return}if(DRAG_RANGE)LOOP_RANGE=DRAG_RANGE.slice();DRAG_RANGE=null;paintLoopRange(LOOP_RANGE);LOOP_UI_OPEN=false;updateLoopUI();startSF()};
 $('#loop-clear').onclick=()=>{LOOP_RANGE=DRAG_RANGE=null;LOOP_UI_OPEN=false;paintLoopRange(null);updateLoopUI();if(PL)start()};
 function open(s){stop();LOOP_RANGE=DRAG_RANGE=null;LOOP_UI_OPEN=false;S=s;T=0;BPM=s.bpm;SY=s.s;$('#bpm').value=BPM;$('#sy').value=SY;
@@ -483,7 +487,7 @@ $('#list').onkeydown=e=>{const row=e.target.closest('li[data-i]');if(!row)return
 function updateStartChoices(){const sel=$('#start-at');if(!sel||!S)return;const prev=sel.value,bars=prep(S.ch,T),opts=[['bar:0','Compasso 1']];bars.forEach((b,i)=>opts.push([`bar:${i}`,`Compasso ${i+1}`]));const seen=new Set();bars.forEach((b,i)=>{const k=b.secName||b.sec;if(k&&!seen.has(k)){seen.add(k);const key=b.sec||k,label=b.secName||({'I':'Introdução','T':'Tema','V':'Verso'}[key]||`Trecho ${key}`);opts.push([`sec:${key}`,`Trecho ${label} (compasso ${i+1})`])}});sel.innerHTML=opts.map(([v,l])=>`<option value="${esc(v)}">${esc(l)}</option>`).join('');sel.value=opts.some(([v])=>v==prev)?prev:'bar:0'}
 $('#start-at').onchange=()=>{if(PL)start()};
 $('#section-apply').onclick=()=>{const choice=$('#section-mark').value,b=eb();if(!choice){b.sec=undefined;b.secName=undefined}else{const map={'Introdução':'I','Intro':'I','Tema':'T','Verso':'V','Refrão':'R'};b.sec=map[choice]||choice;b.secName=choice;if(['Introdução','Tema','Verso','Refrão'].includes(choice))b.txt=choice}erender();updateStartChoices();$('#emsg').textContent=choice?`Trecho ${choice} marcado no compasso ${SEL+1}.`:'Marcação removida.'};
-$('#help-open').onclick=()=>$('#help-dialog').showModal();$('#help-play').onclick=()=>$('#help-dialog').showModal();$('#help-editor').onclick=()=>$('#help-dialog').showModal();$('#help-close').onclick=()=>$('#help-dialog').close();
+$('#help-open').onclick=()=>$('#help-dialog').showModal();$('#help-close').onclick=()=>$('#help-dialog').close();
 $('#bk').onclick=()=>{stop();show('lib')};
 $('#pl').onclick=()=>PL?stop():startSF();
 $('#bpm').oninput=e=>{BPM=+e.target.value;$('#bo').textContent=BPM+' bpm';info()};$('#bpm').onchange=restart;
@@ -647,7 +651,7 @@ const IP='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',IS='<svg vie
 const info=()=>{$('#dI').innerHTML=`<b>${BPM}</b> bpm · ${CH}x · ${tr(S.k,T)}<small>${SL[SY]}</small>`};
 const PN={aj:'Ajustes',mx:'Mixer',ex:'Exportar',dg:'Diagramas e escalas'};
 function sheet(k){const sh=$('#sh');if(!sh.hidden&&sh.dataset.k==k){sh.hidden=true;return}sh.hidden=false;sh.dataset.k=k;$('#sht').textContent=PN[k];['aj','mx','ex','dg'].forEach(x=>$('#pn-'+x).hidden=x!=k)}
-$('#inf').onclick=()=>sheet('aj');$('#mxb').onclick=()=>sheet('mx');$('#exb').onclick=()=>sheet('ex');$('#dgb').onclick=()=>sheet('dg');$('#shx').onclick=()=>$('#sh').hidden=true;
+$('#settings-open').onclick=()=>sheet('aj');$('#mxb').onclick=()=>sheet('mx');$('#exb').onclick=()=>sheet('ex');$('#dgb').onclick=()=>sheet('dg');$('#shx').onclick=()=>$('#sh').hidden=true;
 const cx=q=>{const m=/(\/[A-G][b#]?)$/.exec(q),b=m?m[1]:'';q=q.replace(/\/[A-G][b#]?$/,'').replace(/[()]/g,'').replace(/^69/,'6add9').replace(/^(min|\^|-|h|o)?(.*)$/,(_,p,r)=>p=='min'?'m'+r:p=='^'?'maj'+(r||'7'):p=='-'?(/^\^/.test(r)?'mmaj'+(r.slice(1)||'7'):'m'+r):p=='h'?'m7b5'+r.replace(/^7/, ''):p=='o'?'dim'+r:r);return q+b};
 /* ---- Diagramas de acordes e escalas ---- */
 let DG='off',DGC='',DGREGION=1;
@@ -695,8 +699,9 @@ $('#dg').onclick=e=>{const b=e.target.closest('[data-region]');if(b){DGREGION=+b
 $('#dgo').innerHTML=DGM.map(([k,l])=>`<label class="ck"><input type="radio" name="dgm" value="${k}"${k==DG?' checked':''}>${l}</label>`).join('');
 $('#dgo').onchange=e=>{DG=e.target.value;drawDG()};
 $('#play').addEventListener('click',e=>{if(LOOP_DRAG_CLICK){e.preventDefault();e.stopPropagation();return}if(e.target.closest('.dock,.sheet,button,select,input,label,summary,#dg'))return;
+ document.body.classList.remove('hm');
  const sp=e.target.closest('.bar>span[data-c]');if(sp&&!PL){setDG(sp.dataset.c);return}
- document.body.classList.toggle('hm')});
+ });
 lib();if(!window.JSSynth)sfSt('engine NÃO carregada: confira se engine/js-synthesizer.min.js e engine/libfluidsynth-2.4.6.js existem com esses nomes.');else sfFetch();
 </script>
 
