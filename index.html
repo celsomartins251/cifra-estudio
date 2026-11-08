@@ -201,7 +201,7 @@ const pr=c=>{if(c=='NC')return'<span class="nc">N.C.</span>';const m=/^([A-G][b#
  s=fm(h.replace('m7b5','ø7').replace('maj','Δ').replace(/^m$/,'-').replace('dim','o')+r.replace(re,'')+al.join(''));
  return m[1].replace('b','♭').replace('#','♯')+(s?'<sup>'+s+'</sup>':'')+(m[3]?'<small>'+fm(m[3])+'</small>':'')};
 const SL={swing:'Swing',ballad:'Balada',rock:'Rock',pop:'Pop',funk:'Funk',vaneira:'Vaneira',arrocha:'Arrocha',axe1:'Axé 1',axe2:'Axé 2',superbalada:'Super Balada',guarania:'Guarânia',afoxe:'Afoxé',arrocha2:'Arrocha 2',avioes:'Aviões',baiao:'Baião',natiruts:'Natiruts',pop6:'Pop 6',reggae:'Reggae',pagodao:'Pagodão',bolero:'Bolero',pop16:'Pop 16avos',popdance:'Pop Dance',rockshuffle:'Rock Shuffle',rockbalada:'Rock Balada',reggaeonedrop:'Reggae One Drop',reggaesteppers:'Reggae Steppers',funk16:'Funk 16',funksoul:'Funk Soul',blues68:'Blues 6/8',salsa:'Salsa',mambo:'Mambo',chacha:'Cha-cha-chá',merengue:'Merengue',bossanova:'Bossa Nova',airegin:'Airegin',alfie:'Alfie\'s Theme',blues3:'502 Blues (3/4)'};
-const CATS=['Todas','Jazz','Blues','Latim','Pop','Rock','Funk','Minhas'];
+const BR_STYLE_KEYS=new Set(['bossanova','vaneira','arrocha','axe1','axe2','superbalada','guarania','afoxe','arrocha2','avioes','baiao','pagodao','bolero','pagode','samba','samba1','samba2','maracatu','xaxado','chote','piseiro','vaneira']);\nconst CATS=['Todas','Jazz','Blues','Latim','Brasileiros','Pop','Rock','Funk','Minhas'];
 const RA='Bb G7|Cm7 F7|Dm7 G7|Cm7 F7|Fm7 Bb7|Eb6 Ebm7|Dm7 G7|Cm7 F7';
 const S0=(t,a,c,s,bpm,k,ch)=>({t,a,c,s,bpm,k,ch});
 const SONGS=[
@@ -221,7 +221,7 @@ S0('Funk de 2 acordes em Em','Original de estudo','Funk','funk',100,'Em','Em7|Em
 S0('Valsa em Am (3/4)','Original de estudo','Jazz','swing',130,'Am','T34 {*A Am7|Dm7|E7|N1 Am7 }|N2 Am7 Am6|*B Dm7|G7|Cmaj7|Fmaj7|Bm7b5|E7|Am7|N.C.|%|Z'),
 S0('Estudo: ritornelo, Segno e Coda','Original de estudo','Jazz','swing',120,'C','T44 {*A Cmaj7|Am7|Dm7|G7 }|*B S Fmaj7|Em7 A7|Dm7 Q G7|Cmaj7 <D.S. al Coda>|Q C6|N.C.|%|Z'),
 S0('Blues Lento em 12/8 (E)','Forma tradicional','Blues','swing',90,'E','T128 E7|E7|E7|E7|A7|A7|E7|E7|B7|A7|E7|B7|Z'),
-S0('Teste de ritmo — Bossa Nova','Padrão de acompanhamento Bossa Nova','Latim','bossanova',140,'C','Cmaj7|Dm7 G7|Cmaj7|Am7 D7|Dm7 G7|Cmaj7|Am7|Dm7 G7'),
+S0('Teste de ritmo — Bossa Nova','Padrão de acompanhamento Bossa Nova','Brasileiros','bossanova',140,'C','Cmaj7|Dm7 G7|Cmaj7|Am7 D7|Dm7 G7|Cmaj7|Am7|Dm7 G7'),
 S0('Teste de ritmo — Airegin','Padrão baseado em Airegin','Jazz','airegin',240,'Cm','Cm7|Cm7|Fm7|Fm7|Dm7b5|G7|Cm7|G7'),
 S0('Teste de ritmo — Alfie\'s Theme','Padrão baseado em Alfie\'s Theme','Jazz','alfie',120,'C','Cmaj7|Am7|Dm7|G7|Em7 A7|Dm7 G7|Cmaj7|Cmaj7'),
 S0('Teste de ritmo — 502 Blues (3/4)','Padrão ternário baseado em 502 Blues','Blues','blues3',120,'C','T34 C7|F7|C7|G7|F7|C7')];
@@ -336,7 +336,7 @@ function gen(){
  if(CI)for(let i=0;i<b0;i++)ev.push({b:i,d:.2,k:'d',n:i?76:77,v:i?80:110});
  let o=b0;
  for(let c=0;c<(LOOP_RANGE?1:CH);c++)ord.forEach((k,idx)=>{
-  const bar=bars[k],L=bar.L,cs=bar.c,pt=pat(SY,L,bar.cmp,idx),at=p=>Math.min(cs.length-1,Math.floor(p/(L/cs.length)+1e-6));
+  const bar=bars[k],L=bar.L,cs=bar.c,pt=pat(SY,L,bar.cmp,idx);if(['bossanova','airegin','alfie','blues3'].includes(SY)){const chordSlots=cs.filter(x=>x&&x!=='NC').length;pt.p=chordSlots?Array.from({length:chordSlots},(_,i)=>[i*(L/chordSlots),(L/chordSlots)*.98]):[]}const at=p=>Math.min(cs.length-1,Math.floor(p/(L/cs.length)+1e-6));
   marks.push({b:o,i:k,c:c+1,m:bar.m});
   for(const n in pt.d)pt.d[n].forEach((p,j)=>ev.push({b:o+p,d:.2,k:'d',n:+n,v:(pt.v&&pt.v[n]&&pt.v[n][j])||VEL[n]}));
   pt.p.forEach(([p,d])=>{const cc=cs[at(p)];if(cc=='NC')return;const[r,q]=rt(cc),iv=IV(q);ev.push({b:o+p,d,k:'p',n:48+r,v:50});
@@ -467,7 +467,7 @@ function renamePlaylist(){const p=PLAYLISTS.find(x=>x.id==ACTIVE_PL);if(!p)retur
 $('#pl-new').onclick=()=>{const p=createPlaylist();if(p)lib()};$('#pl-rename').onclick=renamePlaylist;$('#pl-filter').onchange=e=>{ACTIVE_PL=e.target.value;$('#pl-rename').hidden=!ACTIVE_PL;clearSelection();lib()};$('#ep-new').onclick=()=>{const p=createPlaylist();if(p){EDIT_PL=p.id;refreshEditorPlaylists()}};
 function lib(){const q=$('#q').value.toLowerCase(),all=ALL();renderPlaylistControls();
  $('#chips').innerHTML=CATS.map(c=>`<button class="chip${c==F?' on':''}" data-c="${c}">${c}</button>`).join('');
- $('#list').innerHTML=all.map((s,i)=>[s,i]).filter(([s])=>(F=='Todas'||s.c==F||(F=='Minhas'&&s.u))&&(!ACTIVE_PL||s.playlistId==ACTIVE_PL)&&(s.t+s.a).toLowerCase().includes(q)).map(([s,i])=>`<li class="song-row" data-i="${i}" tabindex="0"><span class="song-info"><b>${esc(s.t)}</b><span>${esc(s.a)}</span><small>${SL[s.s]||esc(s.s||'')} · ${s.bpm} bpm · ${esc(s.k||'')}</small>${s.playlistId&&PLAYLISTS.some(p=>p.id==s.playlistId)?`<span class="pl-tag">${esc(PLAYLISTS.find(p=>p.id==s.playlistId).name)}</span>`:''}</span></li>`).join('')||'<p class="mu">Nenhuma música encontrada.</p>';
+ $('#list').innerHTML=all.map((s,i)=>[s,i]).filter(([s])=>(F=='Todas'||(F=='Brasileiros'?BR_STYLE_KEYS.has(s.s):s.c==F)||(F=='Minhas'&&s.u))&&(!ACTIVE_PL||s.playlistId==ACTIVE_PL)&&(s.t+s.a).toLowerCase().includes(q)).map(([s,i])=>`<li class="song-row" data-i="${i}" tabindex="0"><span class="song-info"><b>${esc(s.t)}</b><span>${esc(s.a)}</span><small>${SL[s.s]||esc(s.s||'')} · ${s.bpm} bpm · ${esc(s.k||'')}</small>${s.playlistId&&PLAYLISTS.some(p=>p.id==s.playlistId)?`<span class="pl-tag">${esc(PLAYLISTS.find(p=>p.id==s.playlistId).name)}</span>`:''}</span></li>`).join('')||'<p class="mu">Nenhuma música encontrada.</p>';
  if(selectedSong&&!ALL().includes(selectedSong))clearSelection();else if(selectedSong){const row=$(`#list li[data-i="${ALL().indexOf(selectedSong)}"]`);if(row){row.classList.add('selected');$('#sel-name').textContent='Selecionada: '+selectedSong.t;$('#sel-actions').hidden=false}else clearSelection()}}
 $('#q').oninput=()=>{clearSelection();lib()};
 $('#chips').onclick=e=>{if(e.target.dataset.c){F=e.target.dataset.c;clearSelection();lib()}};
@@ -497,7 +497,7 @@ MIX.forEach(([id,out,k])=>$('#'+id).addEventListener('input',e=>{const x=+e.targ
 $('#pn-mx').onclick=e=>{const m=e.target.closest('[data-mute]'),so=e.target.closest('[data-solo]');if(!m&&!so)return;const k=m?m.dataset.mute:so.dataset.solo;if(m)MUTE[k]=!MUTE[k];else SOLO[k]=!SOLO[k];$('#pn-mx').querySelectorAll('[data-mute]').forEach(b=>{const key=b.dataset.mute;b.classList.toggle('muted',MUTE[key]);b.textContent=MUTE[key]?'ON':'MUTE'});$('#pn-mx').querySelectorAll('[data-solo]').forEach(b=>{const key=b.dataset.solo;b.classList.toggle('solo-on',SOLO[key]);b.textContent=SOLO[key]?'SOLO*':'SOLO'});syncGains()};
 const opt=(a,sel)=>a.map(x=>`<option>${x}</option>`).join('');
 $('#sy').innerHTML=Object.entries(SL).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
-$('#es').innerHTML=$('#sy').innerHTML;$('#ec').innerHTML=opt(CATS.slice(1,7));
+$('#es').innerHTML=$('#sy').innerHTML;$('#ec').innerHTML=opt(CATS.filter(c=>c!=='Todas'&&c!=='Minhas'));
 /* ---- Editor visual (estilo iReal Pro) ---- */
 let ED=null,EB=[],SEL=0,CUR=0,FT='',fr=1;
 const KB=[['C','D','E','F','G','A','B','♭','♯','−'],['1','2','3','5','6','7','9','o','ø','Δ'],['T','%','sus','add','alt','+','/','⌫'],['S','Q','1.','A','␣','{','}','⊞','Próximo']];
@@ -616,7 +616,7 @@ const parseChart=d=>{const b=parseBars(d);return b.length?ser(b):''};
 function styleMap(s){s=(s||'').toLowerCase();
  const latin=/bossa|samba|latin|salsa|mambo|bolero|rumba/.test(s);
  const st=/bossa/.test(s)?'bossanova':/airegin/.test(s)?'airegin':/alfie/.test(s)?'alfie':/502\s*blues/.test(s)?'blues3':/ballad/.test(s)?'ballad':/rock|metal|punk/.test(s)?'rock':/funk|soul|r&b|disco/.test(s)?'funk':/pop|country|folk|reggae|ska/.test(s)?'pop':'swing';
- const c=latin?'Latim':/blues/.test(s)?'Blues':st=='rock'?'Rock':st=='pop'?'Pop':st=='funk'?'Funk':'Jazz';return[st,c]}
+ const c=BR_STYLE_KEYS.has(st)?'Brasileiros':latin?'Latim':/blues/.test(s)?'Blues':st=='rock'?'Rock':st=='pop'?'Pop':st=='funk'?'Funk':'Jazz';return[st,c]}
 function importText(txt){
  txt=txt.replace(/&amp;/g,'&');
  /* Em um atributo HTML, o delimitador é a própria aspa de abertura: um apóstrofo dentro de href entre aspas duplas é parte válida do link. */
