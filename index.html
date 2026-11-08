@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="utf-8">
+<link rel="manifest" href="./manifest.webmanifest">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Cifra Estúdio — Backing tracks para estudo</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -84,7 +85,7 @@ dialog{width:min(560px,94vw);background:var(--bg);border:1px solid var(--ln);bor
 dialog::backdrop{background:#0008}dialog label{display:grid;gap:4px;margin-bottom:10px;font-size:.85rem;color:var(--mu)}
 #msg{min-height:1.4em;color:var(--mu);margin-top:8px;font-size:.9rem}
 </style></head><body>
-<header><span class="logo">♩ Cifra Estúdio</span><span><button id="help-open" type="button" aria-label="Ajuda">Ajuda</button> <button id="im-b">Importar arquivos</button> <button id="nw">+ Nova</button></span></header>
+<header><span class="logo">♩ Cifra Estúdio</span><span><button id="offline-btn" type="button">Preparar offline</button> <button id="im-b">Importar arquivos</button> <button id="nw">+ Nova</button> <button id="help-open" type="button" aria-label="Ajuda">Ajuda</button></span></header>
 <main>
 <section id="lib">
 <input id="q" type="search" placeholder="Buscar música ou compositor…" aria-label="Buscar">
@@ -92,11 +93,11 @@ dialog::backdrop{background:#0008}dialog label{display:grid;gap:4px;margin-botto
 <div id="chips"></div><div id="sel-actions" hidden><span id="sel-name"></span><button id="sel-delete" class="song-del" type="button">Excluir música</button><button id="sel-cancel" type="button">Cancelar</button></div><ul id="list"></ul>
 </section>
 <section id="play" hidden>
-<div class="nav" style="display:flex;gap:8px"><button id="bk">← Biblioteca</button><button id="edt">Editar</button><button id="adjust-play" type="button">Ajustes</button></div>
+<div class="nav" style="display:flex;gap:8px;align-items:center"><button id="bk">← Biblioteca</button><button id="edt">Editar</button><button id="settings-open" type="button">Ajustes</button></div>
 <h1 id="tt"></h1><div id="sub"></div>
 <div id="grid" aria-live="off"></div><div id="loop-tools" hidden><span id="loop-label">Arraste pelos compassos para selecionar um trecho.</span><button id="loop-play" type="button">Tocar loop</button><button id="loop-clear" type="button">Limpar seleção</button></div>
 <div id="dg" hidden></div>
-<div class="dock"><button class="side inf" id="inf" aria-label="Ajustes: andamento, tom e estilo"><span id="dI"></span></button><button class="pbtn" id="pl" aria-label="Tocar ou parar"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button><span class="side ic"><button id="dgb" aria-label="Diagramas e escalas"><svg viewBox="0 0 24 24"><path d="M5 4v16M10 4v16M15 4v16M20 4v16M5 9h15M5 15h15"/></svg></button><button id="mxb" aria-label="Mixer"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button><button id="exb" aria-label="Exportar"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg></button></span><span id="pos"></span></div>
+<div class="dock"><span class="side inf" id="inf" aria-label="Andamento, tom e estilo"><span id="dI"></span></span><button class="pbtn" id="pl" aria-label="Tocar ou parar"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button><span class="side ic"><button id="dgb" aria-label="Diagramas e escalas"><svg viewBox="0 0 24 24"><path d="M5 4v16M10 4v16M15 4v16M20 4v16M5 9h15M5 15h15"/></svg></button><button id="mxb" aria-label="Mixer"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button><button id="exb" aria-label="Exportar"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg></button></span><span id="pos"></span></div>
 <div class="sheet" id="sh" hidden><div class="shh"><b id="sht"></b><button id="shx" aria-label="Fechar">✕</button></div><div class="pn" id="pn-aj"><div class="ctl">
 <div class="w" style="display:grid;grid-column:1/-1;grid-template-columns:1fr 1fr;gap:8px"><label>Aplicar fórmula em<select id="ts-scope"><option value="all">Música inteira</option><option value="bar">Compasso específico</option></select></label><label>Compasso<select id="ts-bar"></select></label><label class="w">Fórmula de compasso<select id="ts-value"><option value="2/4">2/4</option><option value="6/8">6/8</option><option value="4/4" selected>4/4</option><option value="7/4">7/4</option><option value="7/8">7/8</option></select></label><button id="ts-apply" type="button" class="main">Aplicar fórmula</button></div>
 <label class="w">Andamento: <output id="bo"></output><input id="bpm" type="range" min="40" max="300"></label><label class="w">Começar a tocar em<select id="start-at"><option value="bar:0">Compasso 1</option></select></label>
@@ -129,7 +130,7 @@ dialog::backdrop{background:#0008}dialog label{display:grid;gap:4px;margin-botto
 <details open><summary>Biblioteca e playlists</summary><ul><li>Use a busca e as categorias para encontrar músicas.</li><li>Toque em uma música para abrir. Em músicas criadas ou importadas, mantenha pressionado por 1 segundo para selecionar e excluir apenas aquela música.</li><li>Crie uma playlist em <b>+ Playlist</b>, escolha-a no filtro para ver suas músicas e use <b>Renomear</b> para alterar o nome.</li><li>Ao criar ou editar uma música, escolha a playlist em Detalhes. Também é possível criar uma playlist dentro do editor.</li><li><b>+ Nova</b> cria uma música; <b>Importar arquivos</b> permite trazer músicas e playlists compatíveis exportadas do iReal Pro.</li></ul></details>
 <details><summary>Importar músicas do iReal Pro</summary><ul><li>Você pode importar para o Cifra Estúdio músicas e playlists preparadas no <b>iReal Pro</b>, sem precisar cadastrar cada cifra manualmente.</li><li>No iReal Pro, abra a música ou playlist e use a opção <b>Compartilhar</b> para gerar ou salvar o conteúdo em um formato compatível, como arquivo HTML ou TXT.</li><li>No Cifra Estúdio, toque em <b>Importar arquivos</b>, selecione um ou mais arquivos compatíveis e pressione <b>Importar</b>. Também é possível colar no campo de texto um link compartilhável iniciado por <b>irealb://</b>.</li><li>O aplicativo pode processar várias músicas em uma única importação. Depois, procure os itens na Biblioteca e organize-os em playlists, se desejar.</li><li><b>Importante:</b> esta função importa cifras e listas de músicas compatíveis com o iReal Pro. Ela não importa gravações de áudio nem arquivos MIDI. Os ritmos MIDI são um tipo de arquivo diferente e serão tratados por uma função própria.</li></ul></details>
 <details><summary>Editor de cifras</summary><ul><li>Toque em um compasso para selecioná-lo e use o teclado do app para inserir acordes.</li><li>Alterne entre teclado do app e teclado do dispositivo no botão <b>Teclado: app/dispositivo</b>.</li><li>Com teclado externo: ←/→ percorrem os tempos do compasso; ↑/↓ mudam de compasso; Enter avança e cria outro compasso quando necessário.</li><li>As teclas { e } inserem início e fim de ritornelo. Os botões ←/→ junto ao campo de acorde também percorrem os tempos.</li><li>Para marcar A, B, C, D, Introdução, Tema, Verso ou Refrão, selecione o trecho em <b>Marcar trecho deste compasso</b> e toque em <b>Aplicar trecho</b>.</li><li>O botão ⊞ reúne símbolos e marcações musicais; o botão ··· abre tipos de acorde adicionais.</li><li>Preencha Título, categoria e demais dados em Detalhes; toque em Salvar para guardar.</li></ul></details>
-<details><summary>Reprodução e início personalizado</summary><ul><li>No painel de ajustes, em <b>Começar a tocar em</b>, escolha um compasso ou trecho marcado (A/B/Introdução etc.).</li><li>Os compassos seguem a partir do ponto escolhido. Seções repetidas seguem as marcações existentes na cifra.</li><li>A faixa do loop fica oculta quando não está em uso. Toque em um compasso para selecionar um loop de um compasso; arraste do primeiro ao último para selecionar vários. Toque em <b>Tocar loop</b>; os controles se ocultam durante a repetição. Toque ou arraste novamente na cifra para mostrá-los e escolher outro trecho. Use <b>Limpar seleção</b> para sair do loop.</li><li>Ajuste andamento, tom, estilo, número de choruses, contagem e repetição sem parar no painel de ajustes.</li><li>O botão central inicia ou para. Os painéis se recolhem durante a reprodução.</li></ul></details>
+<details><summary>Reprodução e início personalizado</summary><ul><li>No painel de ajustes, em <b>Começar a tocar em</b>, escolha um compasso ou trecho marcado (A/B/Introdução etc.).</li><li>Os compassos seguem a partir do ponto escolhido. Seções repetidas seguem as marcações existentes na cifra.</li><li>A faixa do loop fica oculta quando não está em uso. Para selecionar um compasso ou trecho para loop, mantenha o dedo pressionado sobre o compasso por pelo menos 2 segundos. Depois que a seleção for ativada, arraste para incluir outros compassos. Um toque rápido não seleciona o compasso e mantém os menus disponíveis. Toque em <b>Tocar loop</b>; os controles se ocultam durante a repetição. Toque ou arraste novamente na cifra para mostrá-los e escolher outro trecho. Use <b>Limpar seleção</b> para sair do loop.</li><li>Ajuste andamento, tom, estilo, número de choruses, contagem e repetição sem parar no painel de ajustes.</li><li>O botão central inicia ou para. Os painéis se recolhem durante a reprodução.</li></ul></details>
 <details><summary>Diagramas, mixer e exportação</summary><ul><li>Diagramas/escala: abra pelo botão de diagrama e escolha instrumento e região disponível.</li><li>Mixer: ajuste Piano, Baixo, Bateria, Reverb e Master; MUTE silencia e SOLO isola um canal.</li><li>Exportação: MIDI, MP3 e PDF estão no botão de exportar.</li></ul></details>
 <div style="display:flex;justify-content:flex-end;margin-top:12px"><button id="help-close">Fechar</button></div>
 </dialog>
@@ -464,10 +465,14 @@ function grid(){const bars=prep(S.ch,T);$('#grid').innerHTML=chartHTML(bars,-1);
 function updateLoopUI(){const tools=$('#loop-tools');const r=DRAG_RANGE||LOOP_RANGE;if(!S||!LOOP_UI_OPEN){tools.hidden=true;return}tools.hidden=false;if(r){$('#loop-label').textContent=`Trecho selecionado: compassos ${r[0]+1}–${r[1]+1}${LOOP_RANGE?' · loop ativo':''}`;$('#loop-play').textContent='Tocar loop'}else{$('#loop-label').textContent='Arraste pelos compassos para selecionar um trecho.';$('#loop-play').textContent='Tocar loop'}}
 function paintLoopRange(range){$$('#grid .bar').forEach((el,i)=>el.classList.toggle('loop-selected',!!range&&i>=range[0]&&i<=range[1]))}
 function barAtPoint(x,y){const el=document.elementFromPoint(x,y);const b=el&&el.closest('#grid .bar');return b?+b.dataset.i:null}
-$('#grid').addEventListener('pointerdown',e=>{const bar=e.target.closest('.bar');if(!bar||e.button!==undefined&&e.button!==0)return;LOOP_UI_OPEN=true;DRAG_START=+bar.dataset.i;DRAG_RANGE=[DRAG_START,DRAG_START];DRAG_MOVED=false;updateLoopUI();try{$('#grid').setPointerCapture(e.pointerId)}catch(_){} });
-$('#grid').addEventListener('pointermove',e=>{if(DRAG_START===null)return;const i=barAtPoint(e.clientX,e.clientY);if(i===null)return;if(i!==DRAG_START)DRAG_MOVED=true;if(DRAG_MOVED){DRAG_RANGE=[Math.min(DRAG_START,i),Math.max(DRAG_START,i)];paintLoopRange(DRAG_RANGE);updateLoopUI();e.preventDefault()}});
-function endLoopDrag(e){if(DRAG_START===null)return;if(DRAG_MOVED&&DRAG_RANGE){LOOP_RANGE=DRAG_RANGE.slice();paintLoopRange(LOOP_RANGE);updateLoopUI();LOOP_DRAG_CLICK=true;setTimeout(()=>LOOP_DRAG_CLICK=false,400)}else{LOOP_RANGE=DRAG_RANGE?DRAG_RANGE.slice():null;DRAG_RANGE=null;paintLoopRange(LOOP_RANGE);updateLoopUI()}DRAG_START=null;DRAG_MOVED=false}
-$('#grid').addEventListener('pointerup',endLoopDrag);$('#grid').addEventListener('pointercancel',endLoopDrag);
+let LOOP_HOLD_TIMER=null,LOOP_HOLD_PENDING=false,LOOP_HOLD_ACTIVE=false,LOOP_HOLD_POINTER=null,LOOP_HOLD_X=0,LOOP_HOLD_Y=0;
+function cancelLoopHold(){if(LOOP_HOLD_TIMER!==null)clearTimeout(LOOP_HOLD_TIMER);LOOP_HOLD_TIMER=null;LOOP_HOLD_PENDING=false;LOOP_HOLD_ACTIVE=false;LOOP_HOLD_POINTER=null}
+$('#grid').addEventListener('pointerdown',e=>{const bar=e.target.closest('.bar');if(!bar||e.button!==undefined&&e.button!==0)return;cancelLoopHold();DRAG_START=+bar.dataset.i;DRAG_RANGE=null;DRAG_MOVED=false;LOOP_HOLD_PENDING=true;LOOP_HOLD_POINTER=e.pointerId;LOOP_HOLD_X=e.clientX;LOOP_HOLD_Y=e.clientY;
+ LOOP_HOLD_TIMER=setTimeout(()=>{if(!LOOP_HOLD_PENDING)return;LOOP_HOLD_PENDING=false;LOOP_HOLD_ACTIVE=true;LOOP_UI_OPEN=true;DRAG_RANGE=[DRAG_START,DRAG_START];paintLoopRange(DRAG_RANGE);updateLoopUI();try{$('#grid').setPointerCapture(LOOP_HOLD_POINTER)}catch(_){}},2000);
+});
+$('#grid').addEventListener('pointermove',e=>{if(LOOP_HOLD_PENDING){if(Math.hypot(e.clientX-LOOP_HOLD_X,e.clientY-LOOP_HOLD_Y)>10)cancelLoopHold();return}if(!LOOP_HOLD_ACTIVE||DRAG_START===null)return;const i=barAtPoint(e.clientX,e.clientY);if(i===null)return;if(i!==DRAG_START){DRAG_MOVED=true;DRAG_RANGE=[Math.min(DRAG_START,i),Math.max(DRAG_START,i)];paintLoopRange(DRAG_RANGE);updateLoopUI();e.preventDefault()}});
+function endLoopDrag(){if(LOOP_HOLD_PENDING){cancelLoopHold();DRAG_START=null;DRAG_RANGE=null;return}if(!LOOP_HOLD_ACTIVE||DRAG_START===null)return;if(DRAG_RANGE){LOOP_RANGE=DRAG_RANGE.slice();paintLoopRange(LOOP_RANGE);updateLoopUI();LOOP_DRAG_CLICK=true;setTimeout(()=>LOOP_DRAG_CLICK=false,500)}cancelLoopHold();DRAG_START=null;DRAG_MOVED=false}
+$('#grid').addEventListener('pointerup',endLoopDrag);$('#grid').addEventListener('pointercancel',()=>{cancelLoopHold();DRAG_START=null;DRAG_RANGE=null;DRAG_MOVED=false});
 $('#loop-play').onclick=()=>{if(!DRAG_RANGE&&!LOOP_RANGE){$('#loop-label').textContent='Toque num compasso ou arraste pelo trecho que quer repetir.';LOOP_UI_OPEN=true;updateLoopUI();return}if(DRAG_RANGE)LOOP_RANGE=DRAG_RANGE.slice();DRAG_RANGE=null;paintLoopRange(LOOP_RANGE);LOOP_UI_OPEN=false;updateLoopUI();startSF()};
 $('#loop-clear').onclick=()=>{LOOP_RANGE=DRAG_RANGE=null;LOOP_UI_OPEN=false;paintLoopRange(null);updateLoopUI();if(PL)start()};
 function open(s){stop();LOOP_RANGE=DRAG_RANGE=null;LOOP_UI_OPEN=false;S=s;T=0;BPM=s.bpm;SY=s.s;$('#bpm').value=BPM;$('#sy').value=SY;
@@ -499,7 +504,7 @@ $('#list').onkeydown=e=>{const row=e.target.closest('li[data-i]');if(!row)return
 function updateStartChoices(){const sel=$('#start-at');if(!sel||!S)return;const prev=sel.value,bars=prep(S.ch,T),opts=[['bar:0','Compasso 1']];bars.forEach((b,i)=>opts.push([`bar:${i}`,`Compasso ${i+1}`]));const seen=new Set();bars.forEach((b,i)=>{const k=b.secName||b.sec;if(k&&!seen.has(k)){seen.add(k);const key=b.sec||k,label=b.secName||({'I':'Introdução','T':'Tema','V':'Verso'}[key]||`Trecho ${key}`);opts.push([`sec:${key}`,`Trecho ${label} (compasso ${i+1})`])}});sel.innerHTML=opts.map(([v,l])=>`<option value="${esc(v)}">${esc(l)}</option>`).join('');sel.value=opts.some(([v])=>v==prev)?prev:'bar:0'}
 $('#start-at').onchange=()=>{if(PL)start()};
 $('#section-apply').onclick=()=>{const choice=$('#section-mark').value,b=eb();if(!choice){b.sec=undefined;b.secName=undefined}else{const map={'Introdução':'I','Intro':'I','Tema':'T','Verso':'V','Refrão':'R'};b.sec=map[choice]||choice;b.secName=choice;if(['Introdução','Tema','Verso','Refrão'].includes(choice))b.txt=choice}erender();updateStartChoices();$('#emsg').textContent=choice?`Trecho ${choice} marcado no compasso ${SEL+1}.`:'Marcação removida.'};
-$('#help-open').onclick=()=>$('#help-dialog').showModal();$('#adjust-play').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();sheet('aj')},{capture:true});$('#help-close').onclick=()=>$('#help-dialog').close();
+$('#help-open').onclick=()=>$('#help-dialog').showModal();$('#settings-open').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();sheet('aj')},{capture:true});$('#help-close').onclick=()=>$('#help-dialog').close();
 $('#bk').onclick=()=>{stop();show('lib')};
 $('#pl').onclick=()=>PL?stop():startSF();
 $('#bpm').oninput=e=>{BPM=+e.target.value;$('#bo').textContent=BPM+' bpm';info()};$('#bpm').onchange=restart;
@@ -665,8 +670,8 @@ function refreshTimeSignatureControls(){if(!S)return;const bars=parseBars(S.ch||
 function sheet(k){const sh=$('#sh');if(!sh.hidden&&sh.dataset.k==k){sh.hidden=true;return}sh.hidden=false;sh.dataset.k=k;$('#sht').textContent=PN[k];['aj','mx','ex','dg'].forEach(x=>$('#pn-'+x).hidden=x!=k);if(k=='aj')refreshTimeSignatureControls()}
 $('#ts-scope').onchange=()=>refreshTimeSignatureControls();$('#ts-bar').onchange=()=>{const b=parseBars(S?.ch||'')[+$('#ts-bar').value||0];if(b)$('#ts-value').value=b.m};
 $('#ts-apply').onclick=()=>{if(!S)return;const bars=parseBars(S.ch||'');if(!bars.length)return;const meter=$('#ts-value').value;if($('#ts-scope').value=='all'){bars.forEach((b,i)=>{if(i===0)b.ts=meter;else delete b.ts})}else{const i=Math.max(0,Math.min(bars.length-1,+$('#ts-bar').value||0));bars[i].ts=meter}if(!S.u){const copy={...S,u:1};USER.push(copy);S=copy}else if(!USER.includes(S))USER.push(S);S.ch=ser(bars);save();grid();updateStartChoices();refreshTimeSignatureControls();if(PL)restart();$('#pos').textContent='Fórmula aplicada e salva.'};
-document.addEventListener('click',e=>{const sh=$('#sh');if(!sh.hidden&&!sh.contains(e.target)&&!e.target.closest('#adjust-play,#inf,#mxb,#exb,#dgb'))sh.hidden=true});
-$('#inf').onclick=()=>sheet('aj');$('#mxb').onclick=()=>sheet('mx');$('#exb').onclick=()=>sheet('ex');$('#dgb').onclick=()=>sheet('dg');$('#shx').onclick=()=>$('#sh').hidden=true;
+document.addEventListener('click',e=>{const sh=$('#sh');if(!sh.hidden&&!sh.contains(e.target)&&!e.target.closest('#settings-open,#mxb,#exb,#dgb'))sh.hidden=true});
+$('#mxb').onclick=()=>sheet('mx');$('#exb').onclick=()=>sheet('ex');$('#dgb').onclick=()=>sheet('dg');$('#shx').onclick=()=>$('#sh').hidden=true;
 const cx=q=>{const m=/(\/[A-G][b#]?)$/.exec(q),b=m?m[1]:'';q=q.replace(/\/[A-G][b#]?$/,'').replace(/[()]/g,'').replace(/^69/,'6add9').replace(/^(min|\^|-|h|o)?(.*)$/,(_,p,r)=>p=='min'?'m'+r:p=='^'?'maj'+(r||'7'):p=='-'?(/^\^/.test(r)?'mmaj'+(r.slice(1)||'7'):'m'+r):p=='h'?'m7b5'+r.replace(/^7/, ''):p=='o'?'dim'+r:r);return q+b};
 /* ---- Diagramas de acordes e escalas ---- */
 let DG='off',DGC='',DGREGION=1;
@@ -714,8 +719,35 @@ $('#dg').onclick=e=>{const b=e.target.closest('[data-region]');if(b){DGREGION=+b
 $('#dgo').innerHTML=DGM.map(([k,l])=>`<label class="ck"><input type="radio" name="dgm" value="${k}"${k==DG?' checked':''}>${l}</label>`).join('');
 $('#dgo').onchange=e=>{DG=e.target.value;drawDG()};
 $('#play').addEventListener('click',e=>{if(LOOP_DRAG_CLICK){e.preventDefault();e.stopPropagation();return}if(e.target.closest('.dock,.sheet,button,select,input,label,summary,#dg'))return;
+ document.body.classList.remove('hm');
  const sp=e.target.closest('.bar>span[data-c]');if(sp&&!PL){setDG(sp.dataset.c);return}
- document.body.classList.toggle('hm')});
+ });
 lib();if(!window.JSSynth)sfSt('engine NÃO carregada: confira se engine/js-synthesizer.min.js e engine/libfluidsynth-2.4.6.js existem com esses nomes.');else sfSt('SoundFont será carregado somente quando você iniciar a reprodução.');
+</script>
+<script>
+/* ---- Modo offline: cache do aplicativo e preparação dos recursos de áudio ---- */
+(()=>{
+ const btn=document.getElementById('offline-btn');
+ if(!('serviceWorker' in navigator)||!btn){if(btn)btn.disabled=true;return;}
+ const status=document.createElement('small');
+ status.id='offline-status';status.style.cssText='display:block;font-size:.72rem;color:var(--mu);text-align:right;padding:0 4px';
+ btn.parentElement.appendChild(status);
+ const say=t=>status.textContent=t;
+ navigator.serviceWorker.register('./service-worker.js').then(async reg=>{
+  await navigator.serviceWorker.ready;say('Offline: disponível para preparar');
+  btn.addEventListener('click',()=>{
+   const worker=navigator.serviceWorker.controller||reg.active;
+   if(!worker){say('Reabra o aplicativo para preparar o modo offline.');return;}
+   btn.disabled=true;say('Baixando recursos para uso offline…');worker.postMessage({type:'CACHE_FULL'});
+  });
+  navigator.serviceWorker.addEventListener('message',e=>{
+   if(!e.data)return;
+   if(e.data.type==='CACHE_PROGRESS')say('Preparando offline: '+e.data.done+'/'+e.data.total);
+   if(e.data.type==='CACHE_DONE'){say('Pronto: aplicativo disponível offline');btn.disabled=false;btn.textContent='Offline preparado';}
+   if(e.data.type==='CACHE_ERROR'){say('Falha no preparo offline: '+e.data.message);btn.disabled=false;}
+  });
+  reg.update().catch(()=>{});
+ }).catch(()=>say('Modo offline indisponível neste endereço.'));
+})();
 </script>
 </body></html>
