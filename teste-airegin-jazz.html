@@ -201,7 +201,7 @@ const XO=['b5','#5','b9','9','#9','11','#11','b13','13'],fm=s=>s.replace(/b/g,'�
 const pr=c=>{if(c=='NC')return'<span class="nc">N.C.</span>';const m=/^([A-G][b#]?)([^\/]*)(\/[A-G][b#]?)?$/.exec(c);if(!m)return c;const h=(/^(m7b5|dim|maj|m)/.exec(m[2])||[''])[0],r=m[2].slice(h.length),re=/[b#](?:5|9|11|13)/g,al=(r.match(re)||[]).sort((a,b)=>XO.indexOf(a)-XO.indexOf(b)),
  s=fm(h.replace('m7b5','ø7').replace('maj','Δ').replace(/^m$/,'-').replace('dim','o')+r.replace(re,'')+al.join(''));
  return m[1].replace('b','♭').replace('#','♯')+(s?'<sup>'+s+'</sup>':'')+(m[3]?'<small>'+fm(m[3])+'</small>':'')};
-const SL={jazz:'Jazz',airegin:'Jazz Swing — Estudo Airegin',swing:'Swing',jazzbebop:'Jazz Bebop',bossa1:'Bossa Nova 1',bossa:'Bossa Nova 2',ballad:'Balada',rock:'Rock',pop:'Pop',funk:'Funk',vaneira:'Vaneira',arrocha:'Arrocha',axe1:'Axé 1',axe2:'Axé 2',superbalada:'Super Balada',guarania:'Guarânia',afoxe:'Afoxé',arrocha2:'Arrocha 2',avioes:'Aviões',baiao:'Baião',natiruts:'Natiruts',pop6:'Pop 6',reggae:'Reggae',pagodao:'Pagodão',bolero:'Bolero',pop16:'Pop 16avos',popdance:'Pop Dance',rockshuffle:'Rock Shuffle',rockbalada:'Rock Balada',reggaeonedrop:'Reggae One Drop',reggaesteppers:'Reggae Steppers',funk16:'Funk 16',funksoul:'Funk Soul',blues68:'Blues 6/8',salsa:'Salsa',mambo:'Mambo',chacha:'Cha-cha-chá',merengue:'Merengue'};
+const SL={jazz:'Jazz',airegin:'Jazz Swing — Estudo Airegin',swing:'Swing',bossa1:'Bossa Nova 1',bossa:'Bossa Nova 2',ballad:'Balada',rock:'Rock',pop:'Pop',funk:'Funk',vaneira:'Vaneira',arrocha:'Arrocha',axe1:'Axé 1',axe2:'Axé 2',superbalada:'Super Balada',guarania:'Guarânia',afoxe:'Afoxé',arrocha2:'Arrocha 2',avioes:'Aviões',baiao:'Baião',natiruts:'Natiruts',pop6:'Pop 6',reggae:'Reggae',pagodao:'Pagodão',bolero:'Bolero',pop16:'Pop 16avos',popdance:'Pop Dance',rockshuffle:'Rock Shuffle',rockbalada:'Rock Balada',reggaeonedrop:'Reggae One Drop',reggaesteppers:'Reggae Steppers',funk16:'Funk 16',funksoul:'Funk Soul',blues68:'Blues 6/8',salsa:'Salsa',mambo:'Mambo',chacha:'Cha-cha-chá',merengue:'Merengue'};
 const CATS=['Todas','Jazz','Blues','Latim','Pop','Rock','Funk','Minhas'];
 const RA='Bb G7|Cm7 F7|Dm7 G7|Cm7 F7|Fm7 Bb7|Eb6 Ebm7|Dm7 G7|Cm7 F7';
 const S0=(t,a,c,s,bpm,k,ch)=>({t,a,c,s,bpm,k,ch});
@@ -275,7 +275,6 @@ jazz:{
 },
 
 swing:{p:[[0,1.2],[2.67,.8]],b:[[0,'r'],[1,'3'],[2,'5'],[3,'a']],d:{51:[0,1,1.67,2,3,3.67],42:[1,3]}},
-jazzbebop:{p:[[0,.9],[1.5,.65],[2.67,.65],[3.5,.45]],b:[[0,'r'],[1,'3'],[2,'5'],[3,'a']],d:{42:[1,3],38:[1,3],36:[0,2.5]}},
 bossa:{p:[[0,.8],[1.5,.8],[3,.8]],cycleP:[[[0,.8],[1.5,.8],[3,.8]],[[0,.72],[1,.34],[2.5,.72],[3.5,.34]],[[.5,.34],[1.5,.72],[2.5,.34],[3,.72]],[[0,.72],[1.75,.34],[2.5,.72],[3.5,.34]],[[0,.72],[1.5,.34],[2,.72],[3.25,.34]],[[.5,.34],[1,.72],[2.5,.72],[3.5,.34]],[[0,.72],[1.25,.34],[2,.72],[3.5,.72]],[[0,.72],[1.5,.72],[2.75,.34],[3.5,.34]]],b:[[0,'r'],[1.5,'5'],[2,'r'],[3.5,'5']],d:{36:[0,1.5,2,3.5],42:E8,37:[1.5,3]}},
 bossa1:{p:[[0,.38],[.5,.38],[1.25,.38]],cell:2,b:[[0,'r'],[1,'5']],d:{36:[],42:[0,.5,1.25]}},
 ballad:{p:[[0,3.8]],b:[[0,'r'],[2,'5']],d:{36:[0],42:[0,1,2,3],37:[3]}},
@@ -487,27 +486,30 @@ $('#sf-file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{if(P
  SFDATA=await new Promise((ok,no)=>{const r=new FileReader();r.onprogress=ev=>{if(ev.lengthComputable)sfSt('lendo '+f.name+': '+Math.round(ev.loaded/ev.total*100)+'% de '+mb+' MB')};r.onload=()=>ok(r.result);r.onerror=()=>no(r.error||Error('falha na leitura'));r.onabort=()=>no(Error('leitura cancelada'));r.readAsArrayBuffer(f)});
  SFREADY=false;await sfEnsure()}catch(err){sfSt('erro — '+(err.message||err))}};
 $('#sf-use').onchange=()=>{if(PL)startSF()};
-let ctx,O,PL,tm,raf,li=-1,LOOP_RANGE=null,DRAG_RANGE=null,DRAG_START=null,DRAG_MOVED=false,LOOP_DRAG_CLICK=false,LOOP_UI_OPEN=false;
-function pump(){const P=PL,now=ctx.currentTime;
+let ctx,O,PL,tm,raf,paused=false,li=-1,LOOP_RANGE=null,DRAG_RANGE=null,DRAG_START=null,DRAG_MOVED=false,LOOP_DRAG_CLICK=false,LOOP_UI_OPEN=false;
+function pump(){if(!PL||paused)return;const P=PL,now=ctx.currentTime;
  while(P.i<P.ev.length){const e=P.ev[P.i],t=P.t0+e.b*P.spb;if(t>now+(P.sf?.5:.3))break;(P.sf?sfVoice:voice)(ctx,O,e,Math.max(t,now),e.d*P.spb);P.i++}
  const end=P.t0+P.n*P.spb;
  if(P.i>=P.ev.length&&now+.3>=end){if(LOOP_RANGE||$('#lp').checked){const g=gen2();P.t0=end;P.ev=g.ev;P.n=g.n;P.marks=g.marks;P.bars=g.bars;P.i=0}else if(now>end)stop()}}
 function gen2(){const s=CI;CI=0;const g=gen();CI=s;return g}
-function anim(){if(!PL)return;const bt=(ctx.currentTime-PL.t0)/PL.spb,bs=$$('.bar');bs.forEach(x=>x.classList.remove('cur'));
+function anim(){if(!PL)return;if(paused){raf=requestAnimationFrame(anim);return}const bt=(ctx.currentTime-PL.t0)/PL.spb,bs=$$('.bar');bs.forEach(x=>x.classList.remove('cur'));
  if(bt>=PL.marks[0].b){let m=PL.marks[0];for(const x of PL.marks){if(x.b<=bt+1e-6)m=x;else break}const e=bs[m.i],br=PL.bars[m.i];if(br)setDG(br.c[Math.max(0,Math.min(br.c.length-1,Math.floor((bt-m.b)/(br.L/br.c.length))))]);
   if(e){e.classList.add('cur');if(m.i!=li){li=m.i;e.scrollIntoView({block:'center',behavior:'smooth'})}}$('#pos').textContent='Chorus '+m.c+'/'+CH}
  else $('#pos').textContent='Contagem…';
  raf=requestAnimationFrame(anim)}
 function start(){stop();$('#sh').hidden=true;document.querySelectorAll('.pn').forEach(x=>x.hidden=true);const useSF=sfActive();ctx=useSF?SFC:new(window.AudioContext||window.webkitAudioContext)();if(useSF)SFC.resume();O=mk(ctx);if(useSF){try{SFN.disconnect()}catch(e){}SFN.connect(O.master)}const g=gen();
- PL={ev:g.ev,n:g.n,marks:g.marks,bars:g.bars,t0:ctx.currentTime+(useSF?.35:.2),i:0,spb:60/BPM,sf:useSF};if(useSF)sfMix();tm=setInterval(pump,40);raf=requestAnimationFrame(anim);$('#pl').innerHTML=IS;document.body.classList.add('pl','hm');scrollTo(0,0)}
-function stop(){clearInterval(tm);cancelAnimationFrame(raf);sfSilence();if(ctx){if(ctx===SFC)ctx.suspend().catch(()=>{});else ctx.close()}ctx=O=PL=null;$('#pl').innerHTML=IP;document.body.classList.remove('pl','hm');$('#pos').textContent='';$$('.bar').forEach(x=>x.classList.remove('cur'));li=-1}
+ PL={ev:g.ev,n:g.n,marks:g.marks,bars:g.bars,t0:ctx.currentTime+(useSF?.35:.2),i:0,spb:60/BPM,sf:useSF};paused=false;if(useSF)sfMix();tm=setInterval(pump,40);raf=requestAnimationFrame(anim);$('#pl').innerHTML=IS;document.body.classList.add('pl','hm');scrollTo(0,0)}
+function pausePlayback(){if(!PL||paused)return;paused=true;ctx.suspend().catch(()=>{paused=false});$('#pos').textContent='Pausado';}
+async function resumePlayback(){if(!PL||!paused)return;try{await ctx.resume();paused=false;$('#pos').textContent='Retomando…';}catch(e){$('#pos').textContent='Não foi possível retomar o áudio';}}
+function togglePlayPause(){if(!PL)startSF();else if(paused)resumePlayback();else pausePlayback();}
+function stop(){paused=false;clearInterval(tm);cancelAnimationFrame(raf);sfSilence();if(ctx){if(ctx===SFC)ctx.suspend().catch(()=>{});else ctx.close()}ctx=O=PL=null;$('#pl').innerHTML=IP;document.body.classList.remove('pl','hm');$('#pos').textContent='';$$('.bar').forEach(x=>x.classList.remove('cur'));li=-1}
 const restart=()=>{if(PL)start()};
 function chartHTML(bars,sel,editMode=false){return bars.map((b,i)=>{const[l,r]=ln(bars,i),[n,d]=b.m.split('/'),mk=(b.sec?`<span class="sc">${esc(b.sec)}</span>`:'')+(b.seg?SEG:'')+(b.cod?COD:'');
   return `<div class="bar c${Math.min(b.c.length,6)}${b.showTs?' hts':''}${b.es?' es':''}${i==sel?' sel':''}" data-i="${i}">`+(l?`<i class="bl ${l}"></i>`:'')+(r?`<i class="br ${r}"></i>`:'')
   +(mk?`<span class="mk">${mk}</span>`:'')+(b.txt?`<span class="tx">${esc(b.txt)}</span>`:'')+(b.es?`<span class="en${b.el?' f':''}">${b.el?b.end+'.':''}</span>`:'')
   +(b.showTs?`<span class="ts"><b>${n}</b><b>${d}</b></span>`:'')+(b.rep?RPT:(editMode?Array.from({length:Math.max(beatCount(b),b.c.length)},(_,j)=>b.c[j]?`<span data-c="${b.c[j]}" data-beat="${j}">${pr(b.c[j])}</span>`:`<span class="beat-slot" data-beat="${j}">·</span>`):Array.from({length:b.c.length},(_,j)=>b.c[j]?`<span data-c="${b.c[j]}" data-beat="${j}">${pr(b.c[j])}</span>`:`<span class="beat-slot" data-beat="${j}">·</span>`).join('')) )+'</div>'}).join('')}
 function grid(){const bars=prep(S.ch,T);$('#grid').innerHTML=chartHTML(bars,-1);if(LOOP_RANGE)paintLoopRange(LOOP_RANGE);
- $('#tt').textContent=S.t;$('#sub').textContent=S.a+' · '+SL[SY]+' · Tom '+tr(S.k,T)+' · '+bars[0].m;$('#bo').textContent=BPM+' bpm';info();
+ $('#tt').textContent=S.t;$('#sub').textContent=S.a+' · '+(SL[SY]||'Swing')+' · Tom '+tr(S.k,T)+' · '+bars[0].m;$('#bo').textContent=BPM+' bpm';info();
  if(!PL){DGC='';setDG(bars.flatMap(b=>b.c).find(c=>c!='NC')||'')}}
 function updateLoopUI(){const tools=$('#loop-tools');const r=DRAG_RANGE||LOOP_RANGE;if(!S||!LOOP_UI_OPEN){tools.hidden=true;return}tools.hidden=false;if(r){$('#loop-label').textContent=`Trecho selecionado: compassos ${r[0]+1}–${r[1]+1}${LOOP_RANGE?' · loop ativo':''}`;$('#loop-play').textContent='Tocar loop'}else{$('#loop-label').textContent='Arraste pelos compassos para selecionar um trecho.';$('#loop-play').textContent='Tocar loop'}}
 function paintLoopRange(range){$$('#grid .bar').forEach((el,i)=>el.classList.toggle('loop-selected',!!range&&i>=range[0]&&i<=range[1]))}
@@ -522,7 +524,7 @@ function endLoopDrag(){if(LOOP_HOLD_PENDING){cancelLoopHold();DRAG_START=null;DR
 $('#grid').addEventListener('pointerup',endLoopDrag);$('#grid').addEventListener('pointercancel',()=>{cancelLoopHold();DRAG_START=null;DRAG_RANGE=null;DRAG_MOVED=false});
 $('#loop-play').onclick=()=>{if(!DRAG_RANGE&&!LOOP_RANGE){$('#loop-label').textContent='Toque num compasso ou arraste pelo trecho que quer repetir.';LOOP_UI_OPEN=true;updateLoopUI();return}if(DRAG_RANGE)LOOP_RANGE=DRAG_RANGE.slice();DRAG_RANGE=null;paintLoopRange(LOOP_RANGE);LOOP_UI_OPEN=false;updateLoopUI();startSF()};
 $('#loop-clear').onclick=()=>{LOOP_RANGE=DRAG_RANGE=null;LOOP_UI_OPEN=false;paintLoopRange(null);updateLoopUI();if(PL)start()};
-function open(s){stop();LOOP_RANGE=DRAG_RANGE=null;LOOP_UI_OPEN=false;S=s;T=0;BPM=s.bpm;SY=s.s;$('#bpm').value=BPM;$('#sy').value=SY;
+function open(s){stop();LOOP_RANGE=DRAG_RANGE=null;LOOP_UI_OPEN=false;S=s;T=0;BPM=s.bpm;SY=SL[s.s]?s.s:'swing';$('#bpm').value=BPM;$('#sy').value=SY;
  $('#tp').innerHTML=Array.from({length:12},(_,i)=>i-5).map(t=>`<option value="${t}"${t?'':' selected'}>${tr(s.k,t)} (${t>0?'+':''}${t})</option>`).join('');
  grid();updateStartChoices();paintLoopRange(null);updateLoopUI();show('play')}
 function show(v){$('#sh').hidden=true;document.body.classList.remove('hm');$('#lib').hidden=v!='lib';$('#play').hidden=v!='play';scrollTo(0,0)}
@@ -554,6 +556,7 @@ $('#section-apply').onclick=()=>{const choice=$('#section-mark').value,b=eb();if
 $('#help-open').onclick=()=>$('#help-dialog').showModal();$('#settings-open').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();sheet('aj')},{capture:true});$('#help-close').onclick=()=>$('#help-dialog').close();
 $('#bk').onclick=()=>{stop();show('lib')};
 $('#pl').onclick=()=>PL?stop():startSF();
+document.addEventListener('keydown',e=>{const el=e.target,tag=(el&&el.tagName||'').toLowerCase(),editing=tag==='input'||tag==='textarea'||tag==='select'||el?.isContentEditable;if(editing||document.querySelector('dialog[open]')||e.ctrlKey||e.altKey||e.metaKey)return;const k=e.key,code=e.code,space=code==='Space'||k===' ';const mediaPlay=k==='MediaPlay'||k==='Play',mediaPause=k==='MediaPause'||k==='Pause',mediaToggle=k==='MediaPlayPause'||k==='PlayPause'||e.keyCode===179,mediaStop=k==='MediaStop'||k==='Stop'||e.keyCode===178;if(space||mediaToggle){e.preventDefault();if(!e.repeat)togglePlayPause()}else if(mediaPlay){e.preventDefault();if(!PL)startSF();else if(paused)resumePlayback()}else if(mediaPause){e.preventDefault();pausePlayback()}else if(mediaStop||(k==='Escape'&&PL)){e.preventDefault();stop()}});
 $('#bpm').oninput=e=>{BPM=+e.target.value;$('#bo').textContent=BPM+' bpm';info()};$('#bpm').onchange=restart;
 $('#tp').onchange=e=>{T=+e.target.value;grid();restart()};
 $('#sy').onchange=e=>{SY=e.target.value;grid();restart()};
@@ -683,7 +686,7 @@ const UNS=s=>{let r='';while(s.length>50){const p=s.slice(0,50);s=s.slice(50);if
 const cq=q=>{q=q.replace(/\/[A-G][b#]?$/,'');return /^\^/.test(q)?'maj7':/^-/.test(q)?(/^-\^/.test(q)?'m':/^-(7|9|11|13)/.test(q)?'m7':/^-6/.test(q)?'m6':'m'):/^h/.test(q)?'m7b5':/^o/.test(q)?'dim':/^(7|9|11|13)/.test(q)?'7':/^6/.test(q)?'6':''};
 const parseChart=d=>{const b=parseBars(d);return b.length?ser(b):''};
 function styleMap(s){s=(s||'').toLowerCase();
- const st=/bossa[^|]*1/.test(s)?'bossa1':/bebop|be-bop|jazz bebop/.test(s)?'jazzbebop':/bossa|samba|latin|salsa|mambo|bolero|rumba/.test(s)?'bossa':/ballad/.test(s)?'ballad':/rock|metal|punk/.test(s)?'rock':/funk|soul|r&b|disco/.test(s)?'funk':/pop|country|folk|reggae|ska/.test(s)?'pop':'swing';
+ const st=/bossa[^|]*1/.test(s)?'bossa1':/bossa|samba|latin|salsa|mambo|bolero|rumba/.test(s)?'bossa':/ballad/.test(s)?'ballad':/rock|metal|punk/.test(s)?'rock':/funk|soul|r&b|disco/.test(s)?'funk':/pop|country|folk|reggae|ska/.test(s)?'pop':'swing';
  const c=st=='bossa'?'Latim':/blues/.test(s)?'Blues':st=='rock'?'Rock':st=='pop'?'Pop':st=='funk'?'Funk':'Jazz';return[st,c]}
 function importText(txt){
  txt=txt.replace(/&amp;/g,'&');
@@ -711,7 +714,7 @@ $('#im-ok').onclick=async()=>{let t=$('#imt').value;for(const f of $('#imf').fil
  try{$('#imr').textContent=importText(t)}catch(e){$('#imr').textContent='Erro ao ler o formato: '+e.message}};
 /* ---- Dock, painéis e montador de acordes ---- */
 const IP='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',IS='<svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
-const info=()=>{$('#dI').innerHTML=`<b>${BPM}</b> bpm · ${CH}x · ${tr(S.k,T)}<small>${SL[SY]}</small>`};
+const info=()=>{$('#dI').innerHTML=`<b>${BPM}</b> bpm · ${CH}x · ${tr(S.k,T)}<small>${SL[SY]||'Swing'}</small>`};
 const PN={aj:'Ajustes',mx:'Mixer',ex:'Exportar',dg:'Diagramas e escalas'};
 function refreshTimeSignatureControls(){if(!S)return;const bars=parseBars(S.ch||'');const cur=Math.max(0,Math.min(bars.length-1,+$('#ts-bar').value||0));$('#ts-bar').innerHTML=bars.map((b,i)=>`<option value="${i}">Compasso ${i+1} · ${b.m}</option>`).join('');$('#ts-bar').value=String(cur);$('#ts-bar').disabled=$('#ts-scope').value!='bar';$('#ts-bar').parentElement.hidden=$('#ts-scope').value!='bar';$('#ts-value').value=bars[$('#ts-scope').value=='bar'?cur:0]?.m||'4/4'}
 function sheet(k){const sh=$('#sh');if(!sh.hidden&&sh.dataset.k==k){sh.hidden=true;return}sh.hidden=false;sh.dataset.k=k;$('#sht').textContent=PN[k];['aj','mx','ex','dg'].forEach(x=>$('#pn-'+x).hidden=x!=k);if(k=='aj')refreshTimeSignatureControls()}
