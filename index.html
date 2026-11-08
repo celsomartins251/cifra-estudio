@@ -200,7 +200,7 @@ const XO=['b5','#5','b9','9','#9','11','#11','b13','13'],fm=s=>s.replace(/b/g,'�
 const pr=c=>{if(c=='NC')return'<span class="nc">N.C.</span>';const m=/^([A-G][b#]?)([^\/]*)(\/[A-G][b#]?)?$/.exec(c);if(!m)return c;const h=(/^(m7b5|dim|maj|m)/.exec(m[2])||[''])[0],r=m[2].slice(h.length),re=/[b#](?:5|9|11|13)/g,al=(r.match(re)||[]).sort((a,b)=>XO.indexOf(a)-XO.indexOf(b)),
  s=fm(h.replace('m7b5','ø7').replace('maj','Δ').replace(/^m$/,'-').replace('dim','o')+r.replace(re,'')+al.join(''));
  return m[1].replace('b','♭').replace('#','♯')+(s?'<sup>'+s+'</sup>':'')+(m[3]?'<small>'+fm(m[3])+'</small>':'')};
-const SL={swing:'Swing',bossa:'Bossa Nova',ballad:'Balada',rock:'Rock',pop:'Pop',funk:'Funk',vaneira:'Vaneira',arrocha:'Arrocha',axe1:'Axé 1',axe2:'Axé 2',superbalada:'Super Balada',guarania:'Guarânia',afoxe:'Afoxé',arrocha2:'Arrocha 2',avioes:'Aviões',baiao:'Baião',natiruts:'Natiruts',pop6:'Pop 6',reggae:'Reggae',pagodao:'Pagodão',bolero:'Bolero',pop16:'Pop 16avos',popdance:'Pop Dance',rockshuffle:'Rock Shuffle',rockbalada:'Rock Balada',reggaeonedrop:'Reggae One Drop',reggaesteppers:'Reggae Steppers',funk16:'Funk 16',funksoul:'Funk Soul',blues68:'Blues 6/8',salsa:'Salsa',mambo:'Mambo',chacha:'Cha-cha-chá',merengue:'Merengue'};
+const SL={swing:'Swing',ballad:'Balada',rock:'Rock',pop:'Pop',funk:'Funk',vaneira:'Vaneira',arrocha:'Arrocha',axe1:'Axé 1',axe2:'Axé 2',superbalada:'Super Balada',guarania:'Guarânia',afoxe:'Afoxé',arrocha2:'Arrocha 2',avioes:'Aviões',baiao:'Baião',natiruts:'Natiruts',pop6:'Pop 6',reggae:'Reggae',pagodao:'Pagodão',bolero:'Bolero',pop16:'Pop 16avos',popdance:'Pop Dance',rockshuffle:'Rock Shuffle',rockbalada:'Rock Balada',reggaeonedrop:'Reggae One Drop',reggaesteppers:'Reggae Steppers',funk16:'Funk 16',funksoul:'Funk Soul',blues68:'Blues 6/8',salsa:'Salsa',mambo:'Mambo',chacha:'Cha-cha-chá',merengue:'Merengue'};
 const CATS=['Todas','Jazz','Blues','Latim','Pop','Rock','Funk','Minhas'];
 const RA='Bb G7|Cm7 F7|Dm7 G7|Cm7 F7|Fm7 Bb7|Eb6 Ebm7|Dm7 G7|Cm7 F7';
 const S0=(t,a,c,s,bpm,k,ch)=>({t,a,c,s,bpm,k,ch});
@@ -211,8 +211,6 @@ S0('Rhythm Changes em Bb','Forma AABA','Jazz','swing',180,'Bb',RA+'|'+RA+'|D7|D7
 S0('Ciclo ii–V–I em C','Exercício','Jazz','swing',120,'C','Dm7 G7|Cmaj7|Cmaj7|Em7 A7|Dm7 G7|Cm7 F7|Bbmaj7|Bbmaj7'),
 S0('Cadência Menor ii–V–i em Am','Exercício','Jazz','swing',130,'Am','Bm7b5 E7|Am7|Dm7 G7|Cmaj7|F#m7b5 B7|Em7|Bm7b5 E7|Am6'),
 S0('Círculo de Quintas em C','Exercício','Jazz','swing',140,'C','Cmaj7|Fmaj7|Bm7b5|E7|Am7|Dm7|G7|Cmaj7'),
-S0('Bossa Menor em Dm','Original de estudo','Latim','bossa',130,'Dm','Dm7|Dm7|Gm7|C7|Fmaj7|Bbmaj7|Em7b5 A7|Dm7'),
-S0('Bossa ii–V em G','Original de estudo','Latim','bossa',140,'G','Gmaj7|Gmaj7|Am7 D7|Gmaj7|Cmaj7|Cm7 F7|Bm7 E7|Am7 D7'),
 S0('Balada de Jazz em Eb','Original de estudo','Jazz','ballad',66,'Eb','Ebmaj7|Cm7|Fm7|Bb7|Ebmaj7|Abmaj7|Gm7 C7|Fm7 Bb7'),
 S0('Pop I–V–vi–IV em C','Progressão popular','Pop','pop',100,'C','C|G|Am|F|C|G|Am|F'),
 S0('Balada Pop vi–IV–I–V','Progressão popular','Pop','ballad',72,'Am','Am|F|C|G|Am|F|C|G'),
@@ -224,12 +222,12 @@ S0('Valsa em Am (3/4)','Original de estudo','Jazz','swing',130,'Am','T34 {*A Am7
 S0('Estudo: ritornelo, Segno e Coda','Original de estudo','Jazz','swing',120,'C','T44 {*A Cmaj7|Am7|Dm7|G7 }|*B S Fmaj7|Em7 A7|Dm7 Q G7|Cmaj7 <D.S. al Coda>|Q C6|N.C.|%|Z'),
 S0('Blues Lento em 12/8 (E)','Forma tradicional','Blues','swing',90,'E','T128 E7|E7|E7|E7|A7|A7|E7|E7|B7|A7|E7|B7|Z')];
 let USER=[];try{USER=JSON.parse(localStorage.getItem('cs_user')||'[]')}catch(e){}
+USER.forEach(song=>{if(song&&song.s==='bossa')song.s='swing'});
 let PLAYLISTS=[];try{PLAYLISTS=JSON.parse(localStorage.getItem('cs_playlists')||'[]')}catch(e){}
 const ALL=()=>SONGS.concat(USER),save=()=>{try{localStorage.setItem('cs_user',JSON.stringify(USER));return true}catch(e){return false}},savePlaylists=()=>{try{localStorage.setItem('cs_playlists',JSON.stringify(PLAYLISTS));return true}catch(e){return false}};
 const E8=Array.from({length:8},(_,i)=>i/2);
 const STY={
 swing:{p:[[0,1.2],[2.67,.8]],b:[[0,'r'],[1,'3'],[2,'5'],[3,'a']],d:{51:[0,1,1.67,2,3,3.67],42:[1,3]}},
-bossa:{p:[[0,.8],[1.5,.8],[3,.8]],b:[[0,'r'],[1.5,'5'],[2,'r'],[3.5,'5']],d:{36:[0,1.5,2,3.5],42:E8,37:[1.5,3]}},
 ballad:{p:[[0,3.8]],b:[[0,'r'],[2,'5']],d:{36:[0],42:[0,1,2,3],37:[3]}},
 rock:{p:[[0,1.8],[2,1.8]],b:E8.map(x=>[x,'r']),d:{36:[0,2,2.5],38:[1,3],42:E8}},
 pop:{p:[[0,3.8]],b:[[0,'r'],[2,'r'],[3.5,'5']],d:{36:[0,2],38:[1,3],42:E8}},
@@ -608,8 +606,9 @@ const UNS=s=>{let r='';while(s.length>50){const p=s.slice(0,50);s=s.slice(50);if
 const cq=q=>{q=q.replace(/\/[A-G][b#]?$/,'');return /^\^/.test(q)?'maj7':/^-/.test(q)?(/^-\^/.test(q)?'m':/^-(7|9|11|13)/.test(q)?'m7':/^-6/.test(q)?'m6':'m'):/^h/.test(q)?'m7b5':/^o/.test(q)?'dim':/^(7|9|11|13)/.test(q)?'7':/^6/.test(q)?'6':''};
 const parseChart=d=>{const b=parseBars(d);return b.length?ser(b):''};
 function styleMap(s){s=(s||'').toLowerCase();
- const st=/bossa|samba|latin|salsa|mambo|bolero|rumba/.test(s)?'bossa':/ballad/.test(s)?'ballad':/rock|metal|punk/.test(s)?'rock':/funk|soul|r&b|disco/.test(s)?'funk':/pop|country|folk|reggae|ska/.test(s)?'pop':'swing';
- const c=st=='bossa'?'Latim':/blues/.test(s)?'Blues':st=='rock'?'Rock':st=='pop'?'Pop':st=='funk'?'Funk':'Jazz';return[st,c]}
+ const latin=/bossa|samba|latin|salsa|mambo|bolero|rumba/.test(s);
+ const st=/ballad/.test(s)?'ballad':/rock|metal|punk/.test(s)?'rock':/funk|soul|r&b|disco/.test(s)?'funk':/pop|country|folk|reggae|ska/.test(s)?'pop':'swing';
+ const c=latin?'Latim':/blues/.test(s)?'Blues':st=='rock'?'Rock':st=='pop'?'Pop':st=='funk'?'Funk':'Jazz';return[st,c]}
 function importText(txt){
  txt=txt.replace(/&amp;/g,'&');
  /* Em um atributo HTML, o delimitador é a própria aspa de abertura: um apóstrofo dentro de href entre aspas duplas é parte válida do link. */
@@ -623,7 +622,7 @@ function importText(txt){
    const ch=parseChart(raw);if(!ch){bad++;return}
    const[st,cat]=styleMap(p[si]||''),w=(p[1]||'').trim().split(/\s+/),comp=w.length==2?w[1]+' '+w[0]:(p[1]||'').trim();
    let k=(p[ki]||'').replace('-','m').replace(/\s/g,'');if(!/^[A-G][b#]?m?$/.test(k)){const[r,q]=rt(parseBars(ch).flatMap(b=>b.c).find(c=>c!='NC')||'C');k=N[r]+(/^m(?!aj)/.test(q)?'m':'')}
-   const bpm=(di>=0?p.slice(di+1):p.slice(ci+1)).map(Number).find(n=>n>=40&&n<=300)||{swing:140,bossa:130,ballad:68,rock:120,pop:100,funk:100}[st];
+   const bpm=(di>=0?p.slice(di+1):p.slice(ci+1)).map(Number).find(n=>n>=40&&n<=300)||{swing:140,ballad:68,rock:120,pop:100,funk:100}[st];
    const title=(p[0]||'').trim(),sameChart=x=>x.t==title&&x.a==comp&&x.ch==ch;const ex=USER.findIndex(sameChart);if(ex>=0){Object.assign(USER[ex],{c:cat,s:st,bpm,k,ch,...(ACTIVE_PL?{playlistId:ACTIVE_PL}:{})});upd++;return}
    if(ALL().some(sameChart)){dup++;return}
    USER.push({t:title,a:comp,c:cat,s:st,bpm,k,ch,u:1,playlistId:ACTIVE_PL||''});added++})});
